@@ -113,13 +113,6 @@ import CommentIframe from '../components/CommentIframe.vue'
 export default {
   data() {
       return {
-        avatarBaseUrl: 'http://localhost:3333/avatar/default/',
-        expression: {
-          emoji: {
-            list: [],
-            url: 'http://localhost:3333/expression/emoji/'
-          }
-        },
         commentinfo: {
           suc: false,
           error: false,
@@ -156,6 +149,7 @@ export default {
     },
     mounted() {
       this.activeCommentIframe();
+
     },
     created() {
       this.User = global.User;
@@ -335,14 +329,10 @@ export default {
 }
 </script>
 <style>
-
 </style>
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-img.emoji {
-  width: 20px;
-  height: 20px;
-}
+
 .comment-box {
   width: 100%;
   margin: 20px 0;

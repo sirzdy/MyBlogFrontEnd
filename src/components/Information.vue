@@ -136,8 +136,8 @@ export default {
       userinfo: {},
       avatar: null,
       avatars: [],
-      avatarBaseUrl: 'http://localhost:3333/avatar/default/',
-      serverUrl: 'http://localhost:3333/',
+      avatarBaseUrl: '',
+      serverUrl: '',
       cur: false, //cur false 修改基本信息 true 修改头像
       personal: false, //自定义头像
       sucinfo: {
@@ -153,6 +153,8 @@ export default {
   mounted() {
     this.initAvatarCrop();
     this.userinfo = Util.deepCopy(User);
+    this.avatarBaseUrl = global.avatarBaseUrl;
+    this.serverUrl = global.serverUrl;
   },
   methods: {
     initmsg: function() {

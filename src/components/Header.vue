@@ -17,6 +17,7 @@
       <router-link class="header-link header-link-btn" :to="{ name: 'Signin'}" v-if="!User._id">登录</router-link>
       <div v-if="User._id" tabindex="-1" style="outline:none;padding:5px;" id="header-hor-dropdown-menu-div" v-on:click="toggleMenu()" v-on:blur="toggleMenu(false)">
         <img v-bind:src="User.avatar||avatarBaseUrl+'default.png'" class="img-rounded" style="width:28px;height:28px;cursor:pointer;">
+        <span class="badge">4</span>
         <ul id="header-hor-dropdown-menu" class="header-hor-dropdown-menu">
           <li v-on:click="goWrite">
             <i class="fa fa-pencil fa-fw "></i> 写文章
@@ -89,7 +90,7 @@
           <li>
             <i class="fa fa-envelope-o fa-fw"></i> 我的消息
           </li>
-          <li data-toggle="modal" data-target="#inf">
+          <li data-toggle="modal" data-target="#inf" @click="">
             <i class="fa fa-address-card-o fa-fw"></i> 修改信息
           </li>
           <li v-on:click="goChangePassword">
@@ -129,12 +130,13 @@ export default {
         User: {},
         menuShow: false,
         myMenuShow: false,
-        avatarBaseUrl: 'http://localhost:3333/avatar/default/'
+        avatarBaseUrl: ''
       }
     },
     created() {
       this.User = global.User;
       this.module = global.module;
+      this.avatarBaseUrl = global.avatarBaseUrl
     },
     components: {
       Information
@@ -316,7 +318,7 @@ export default {
   }
 }
 
-@media screen and (min-width: 550px) {
+@media screen and (min-width: 551px) {
   .header-ver {
     display: none;
   }

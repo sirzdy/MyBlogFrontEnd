@@ -1,5 +1,5 @@
 <template>
-  <div v-title v-bind:data-title="post.title">
+  <div >
     <div class="post">
       <div class="text-center" v-if="loading">
         <i class="fa fa-spinner fa-spin fa-2x"></i>
@@ -13,7 +13,7 @@
           <small>
             <span class="label label-info" data-toggle="tooltip" data-placement="top" title="分类"><i class="fa fa-bookmark"></i> {{ post.category.name }}</span>
           </small>
-          <span data-toggle="tooltip" data-placement="top" title="标题">{{ post.title }} </span>  
+          <span data-toggle="tooltip" data-placement="top" v-title v-bind:data-title="post.title" title="标题">{{ post.title }} </span>  
           <button class="btn btn-xs btn-default" v-show="post.author&&post.author._id==User._id" v-on:click="goEdit">编辑</button>
           </h1>
           <h4>
@@ -92,7 +92,7 @@ import Preview from '../components/Preview.vue'
 export default {
   data() {
       return {
-        avatarBaseUrl: 'http://localhost:3333/avatar/default/',
+        avatarBaseUrl: '',
         loading: false,
         post: null,
         error: null,
@@ -113,6 +113,7 @@ export default {
     created() {
       this.getPost();
       this.User = global.User;
+      this.avatarBaseUrl=global.avatarBaseUrl;
     },
     updated() {
       this.post && $('#preview').html(markdown.toHTML(this.post.content));

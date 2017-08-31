@@ -4,11 +4,11 @@
     </iframe>
     <div class="comment-iframe-fn">
       <i class="fa fa-smile-o fa-lg" style="color:#408ff2;cursor:pointer;margin:0 10px" v-on:click="toggleExpression(commentid)">
-      	<div class="expression" style="cursor:auto;" onselect="return false" v-bind:id="'Expression'+commentid">
-	        <div id="emoji" >
-	          <img class="emoji" v-bind:src="e.url" alt="" v-for="e in expression.emoji.list" v-on:click="addEmoji($event,commentid)">
-	        </div>
-	      </div>
+        <div class="expression" style="cursor:auto;" onselect="return false" v-bind:id="'Expression'+commentid">
+          <div id="emoji" >
+            <img class="emoji" v-bind:src="e.url" alt="" v-for="e in expression.emoji.list" v-on:click="addEmoji($event,commentid)">
+          </div>
+        </div>
       </i>
       <div class="flex-row-emp"></div>
       <div class="flex-row-emp" style="color:#8a6d3b;text-align:right;" v-show="commentinfo.error">{{commentinfo.msg}}</div>
@@ -24,13 +24,13 @@
 import Util from '../assets/js/util.js'
 
 export default {
-  props: ['commentid','commentinf'],
+  props: ['commentid', 'commentinf'],
   data() {
     return {
       expression: {
         emoji: {
           list: [],
-          url: 'http://localhost:3333/expression/emoji/'
+          url: ''
         }
       },
       // commentIframe: [],
@@ -44,6 +44,7 @@ export default {
   },
   created() {
     this.User = global.User;
+    this.expression.emoji.url = global.expression.emoji;
     /*初始化表情列表*/
     var url = this.expression.emoji.url;
     for (var i = 0; i < 30; i++) {
@@ -125,7 +126,7 @@ export default {
             that.commentinfo.msg = response.data.msg;
             console.log("回复成功");
             commentBody.innerHTML = '';
-            that.$emit('submit-comment', response.data.reply,that.commentinf);
+            that.$emit('submit-comment', response.data.reply, that.commentinf);
           } else if (response.data.recode === '5001') {
             console.log(response.data)
             that.commentinfo.errsign = true;
@@ -149,6 +150,7 @@ img.emoji {
   width: 20px;
   height: 20px;
 }
+
 .comment-iframe-div {
   margin: 20px 0;
   display: flex;

@@ -333,7 +333,7 @@ export default {
           console.log(window.location.origin, response.data)
           if (response.data.recode == '0000') {
             var e = document.createElement('a');
-            e.href = window.location.origin.replace('8080', '3333') + '/' + response.data.path;
+            e.href = global.serverUrl + '/' + response.data.path;
             e.download = (params.title || 'NoTitle') + '.md';
             e.click();
           } else {
@@ -527,6 +527,9 @@ export default {
   position: absolute;
   top: 140px;
   width: 260px;
+  left:50%;
+  top:50%;
+  transform: translateX(-50%) translateY(-50%);
   /*height: 200px;*/
   background: #fff;
   padding: 30px 15px;

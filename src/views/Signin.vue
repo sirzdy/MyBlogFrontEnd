@@ -42,8 +42,8 @@ export default {
           'con': '',
           'show': false
         },
-        'email': '',
-        'password': '',
+        'email': 'boxuerixin@qq.com',
+        'password': '123456',
         'backRouter': {
           'name': 'Index'
         }

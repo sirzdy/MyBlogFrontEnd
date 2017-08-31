@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import axios from 'axios';
+import * as io from 'socket.io-client'
 
 import Hello from '@/views/Hello'
 import test from '@/components/test'
@@ -70,12 +71,28 @@ const router = new Router({
   }, {
     path: '/Chat',
     name: 'Chat',
-    component: Chat
+    component: Chat,
+    meta: {
+      requireAuth: true // 添加该字段，表示进入这个路由是需要登录的
+    }
   }]
 })
 router.beforeEach((to, from, next) => {
+  global.expression = {};
+  global.serverUrl = 'http://192.168.43.37:3333/';
+  global.expression.emoji = global.serverUrl + 'expression/emoji/';
+  global.avatarBaseUrl = global.serverUrl + 'avatar/default/';
   axios.post('/check').then(function(response) {
     global.User = response.data.user || {};
+    // if (response.data.recode == '0000') {
+    //   if (!global.socket) {
+    //     global.socket = io(global.serverUrl);
+    //     var socket = global.socket;
+    //     socket.on('chat info', function() {
+    //       socket.emit('chat info', global.User);
+    //     })
+    //   }
+    // }
     if (to.meta.requireAuth && response.data.recode !== '0000') { // 判断该路由是否需要登录权限
       router.push('Signin');
     } else {
@@ -86,7 +103,6 @@ router.beforeEach((to, from, next) => {
     // console.log(from);
     global.backRouter = { 'name': from.name, 'params': from.params };
   }
-
   global.module = to.name;
 });
 
