@@ -20,8 +20,8 @@
             </div>
             <div class="flex-row-emp user-panel-tab" :class="{'tab-active':curTab==2}" @click="curTab=2;">聊天室
             </div>
-            <!-- <div class="flex-row-emp" :class="{'tab-active':curTab==3}" @click="curTab=3">最近联系
-            </div> -->
+            <div class="flex-row-emp" :class="{'tab-active':curTab==3}" @click="curTab=3">最近联系
+            </div>
           </div>
           <div class="flex-column-emp flex-column" style="width:100%;">
             <div class="flex-column-emp" style="width:100%;overflow:scroll;flex-wrap: nowrap;" v-show="curTab==1">
@@ -29,10 +29,10 @@
                 当前共{{chatList.length}}人在线
                 <i class="fa fa-refresh btn-refresh" id="btnChatRefresh" @click="getChatList()"></i>
               </div>
-              <div v-for="chat in chatList" v-if="chat" class="chatList flex-row flex-center" @click="chatWithPerson(chat);setPanel(false);notReadMesCount[chat.id]=null;">
+              <div v-for="chat in chatList" v-if="chat" class="chatList flex-row flex-center" @click="chatWithPerson(chat);setPanel(false);notReadMesCount[chat._id]=null;">
                 <span>{{chat.nickname}}</span>
                 <span class="flex-row-emp"></span>
-                <span class="badge">{{notReadMesCount[chat.id]}}</span>
+                <span class="badge">{{notReadMesCount[chat._id]}}</span>
               </div>
             </div>
             <div class="flex-column-emp" style="width:100%;overflow:scroll;flex-wrap: nowrap;" v-show="curTab==2">
@@ -45,7 +45,7 @@
                 <input type="text" class="form-control" placeholder="请输入房间名字" v-model="addRoomName">
                 <span class="input-group-addon" v-on:click="addRoom">新增聊天室</span>
               </div>
-              <div v-for="room in roomList" v-if="room" class="chatList flex-row flex-center" @click="enterRoom(room.name);setPanel(false);notReadMesCount[room.name]=null;">
+              <div v-for="room in roomList" v-if="room" class="chatList flex-row flex-center" @click="enterRoom(room);setPanel(false);notReadMesCount[room.name]=null;">
                 <span>{{room.name}}</span>
                 <span class="flex-row-emp"></span>
                 <span class="badge">{{notReadMesCount[room.name]}}</span>
@@ -53,9 +53,17 @@
                 <span v-show="room.creator==socketInfo._id" @click.stop="removeRoom(room.name)"><i class="fa fa-close fa-fw"></i></span>
               </div>
             </div>
+            <div class="flex-column-emp" style="width:100%;overflow:scroll;flex-wrap: nowrap;" v-show="curTab==3">
+              <div v-for="recent in recentList" v-if="recentList" class="chatList flex-row flex-center" @click="chatRecent(recent);setPanel(false);">
+                <span>{{recent.nickname||recent.name}}</span>
+                <span class="flex-row-emp"></span>
+                <span class="badge">{{notReadMesCount[recent._id||recent.name]}}</span>
+                <i class="fa fa-group" v-if="recent.type=='room'"></i>
+              </div>
+            </div>
           </div>
           <div class="user-panel-exit flex-row">
-            <div class="flex-row-emp" v-on:click="hasLogined=false;logOut()">退出</div>
+            <div class="flex-row-emp" v-on:click="logOut()">退出</div>
             <!-- <div class="flex-row-emp" v-on:click="userPanel=false;">隐藏</div> -->
           </div>
         </div>
@@ -166,6 +174,7 @@ export default {
             url: ''
           }
         },
+        recentList: [],
         socketInfo: null,
         chatList: [],
         roomList: [],
@@ -294,96 +303,111 @@ export default {
         // that.socket.on('chat info', function() {
         //   that.socket.emit('chat info', that.User);
         // })
-        that.socket = io(that.serverUrl);
-        that.socket.on('chat info', function() {
-          that.socket.emit('chat info', that.User);
-        })
+        that.socket = io.connect(that.serverUrl + 'chat');
+        global.chatSocket = that.socket;
+        that.socket.on('connect', function() {
+          that.socket.on('chat info', function() {
+            that.socket.emit('chat info', that.User);
+          })
 
-        function initChatList(data) {
-          that.chatList = data;
-          for (var i in that.chatList) {
-            if (!that.chatList[i]) return;
-            var person = that.chatList[i]._id;
-            !that.messages[person] && that.$set(that.messages, person, []) && that.$set(that.notReadMesCount, person, null);
-          }
-          $("#btnChatRefresh").removeClass('fa-spin');
-        }
-
-        function initRoomList(data) {
-          that.roomList = data;
-          for (var i = 0, len = that.roomList.length; i < len; i++) {
-            // if (!that.roomList[i]) return;
-            var room = that.roomList[i].name;
-            if (!that.messages[room]) {
-              that.$set(that.messages, room, []);
-              that.$set(that.notReadMesCount, room, null);
-              that.$set(that.inRoom, room, false);
-              that.$set(that.roomUsers, room, false);
+          function initChatList(data) {
+            that.chatList = data;
+            for (var i in that.chatList) {
+              if (!that.chatList[i]) return;
+              var person = that.chatList[i]._id;
+              !that.messages[person] && that.$set(that.messages, person, []);
+              !that.notReadMesCount[person] && that.$set(that.notReadMesCount, person, null);
             }
+            if (that.current && that.current.type == 'person') {
+              if (that.current.id) {
+                var exist = false;
+                for (var i in that.chatList) {
+                  if (that.chatList[i]._id == that.current.id) {
+                    exist = true;
+                  }
+                }
+                if (!exist) {
+                  Util.hint('【' + that.current.name + '】下线了');
+                  that.initCurrent();
+                }
+              }
+            }
+            $("#btnChatRefresh").removeClass('fa-spin');
           }
-          $("#btnRoomRefresh").removeClass('fa-spin');
-        }
-        that.socket.on('chat list', function(data) {
-          initChatList(data);
-        })
-        that.socket.on('room list', function(data) {
-          initRoomList(data);
-        })
-        that.socket.on('enter room', function(data) {
-          var id = data.room;
-          that.roomUsers[id] = data.roomUsers;
-          that.messages[id].push({
-            info: '进入了房间',
-            user: data.user.nickname,
-            time: data.time
-          });
-        })
-        that.socket.on('leave room', function(data) {
-          var id = data.room;
-          that.roomUsers[id] = data.roomUsers;
-          that.messages[id].push({
-            info: '离开了房间',
-            user: data.user.nickname,
-            time: data.time
-          });
-        })
-        that.socket.on('room exist', function(data) {
-          Util.hint('房间名已被占用', 1000);
-        })
-        that.socket.on('chat receive', function(data) {
-          var id = data.room || data.from;
-          that.messages[id].push(data)
-          if (that.notReadMesCount[id]) {
-            that.notReadMesCount[id]++;
-          } else {
-            that.notReadMesCount[id] = 1;
-          }
-          that.notReadMesCount[that.current.id] = null;
-          if (data.from) {
-            var msg = '<b>【' + data.user.nickname + '】</b>' + data.msg;
-            Util.msg(msg, function() {
-              that.current.type = 'person';
-              that.current.name = data.user.nickname;
-              that.current.id = data.from;
-            }, 2000);
-          }
-          // that.$set(that.notReadMesCount, that.current.id, null);
-        })
-        that.socket.on('chat receive self', function(data) {
-          data.to && that.messages[data.to].push(data);
-        })
-        that.socket.on('log in', function(data) {
-          if (that.socketInfo && that.socketInfo._id == data.logInInfo._id /*&& that.socketInfo.id != data.id*/ ) {
-            alert("您已经在其他地方登录，被签退。")
-            that.logOut();
-            // that.socket.disconnect();
-          } else if (!that.socketInfo) {
-            that.socketInfo = data.logInInfo;
-          }
-          initChatList(data.chatList);
-          initRoomList(data.roomList);
-        });
 
+          function initRoomList(data) {
+            that.roomList = data;
+            for (var i = 0, len = that.roomList.length; i < len; i++) {
+              // if (!that.roomList[i]) return;
+              var room = that.roomList[i].name;
+              !that.messages[room] && that.$set(that.messages, room, []);
+              !that.notReadMesCount[room] && that.$set(that.notReadMesCount, room, null);
+              !that.inRoom[room] && that.$set(that.inRoom, room, false);
+              !that.roomUsers[room] && that.$set(that.roomUsers, room, false);
+            }
+            $("#btnRoomRefresh").removeClass('fa-spin');
+          }
+          that.socket.on('chat list', function(data) {
+            initChatList(data);
+          })
+          that.socket.on('room list', function(data) {
+            initRoomList(data);
+          })
+          that.socket.on('enter room', function(data) {
+            var id = data.room;
+            that.roomUsers[id] = data.roomUsers;
+            that.messages[id].push({
+              info: '进入了房间',
+              user: data.user.nickname,
+              time: data.time
+            });
+          })
+          that.socket.on('leave room', function(data) {
+            var id = data.room;
+            that.roomUsers[id] = data.roomUsers;
+            that.messages[id].push({
+              info: '离开了房间',
+              user: data.user.nickname,
+              time: data.time
+            });
+          })
+          that.socket.on('room exist', function(data) {
+            Util.hint('房间名已被占用', 1000);
+          })
+          that.socket.on('chat receive', function(data) {
+            var id = data.room || data.from;
+            that.messages[id].push(data)
+            if (that.notReadMesCount[id]) {
+              that.notReadMesCount[id]++;
+            } else {
+              that.notReadMesCount[id] = 1;
+            }
+            that.notReadMesCount[that.current.id] = null;
+            if (data.from) {
+              var msg = '<b>【' + data.user.nickname + '】</b>' + data.msg;
+              Util.msg(msg, function() {
+                that.current.type = 'person';
+                that.current.name = data.user.nickname;
+                that.current.id = data.from;
+              }, 2000);
+            }
+            // that.$set(that.notReadMesCount, that.current.id, null);
+          })
+          that.socket.on('chat receive self', function(data) {
+            data.to && that.messages[data.to].push(data);
+          })
+          that.socket.on('log in', function(data) {
+            if (that.socketInfo && that.socketInfo._id == data.logInInfo._id /*&& that.socketInfo.id != data.id*/ ) {
+              alert("您已经在其他地方登录，被签退。")
+              that.logOut();
+              return;
+            } else if (!that.socketInfo) {
+              that.socketInfo = data.logInInfo;
+            }
+            initChatList(data.chatList);
+            initRoomList(data.roomList);
+          });
+        })
       },
       getChatList() {
         var that = this;
@@ -404,6 +428,8 @@ export default {
         that.initCurrent();
         that.initState();
         that.socket.disconnect();
+        that.hasLogined = false;
+        delete global.chatSocket;
       },
       addRoom() {
         var that = this;
@@ -421,20 +447,40 @@ export default {
         }
         that.socket.emit('remove room', room);
       },
+      chatRecent(recent) {
+        var that = this;
+        if (recent.type == 'person') {
+          that.chatWithPerson(recent);
+          that.notReadMesCount[recent._id] = null;
+        }
+        if (recent.type == 'room') {
+          that.enterRoom(recent);
+          that.notReadMesCount[recent.name] = null;
+        }
+      },
       enterRoom(room) {
         var that = this;
         that.current.type = 'room';
-        that.current.name = room;
-        that.current.id = room;
-        if (!that.inRoom[room]) {
-          that.socket.emit('enter room', room);
-          that.inRoom[room] = true;
-          if (that.messages[room].length) {
-            that.messages[room].push({
+        that.current.name = room.name;
+        that.current.id = room.name;
+        if (!that.inRoom[room.name]) {
+          that.socket.emit('enter room', room.name);
+          that.inRoom[room.name] = true;
+          if (that.messages[room.name].length) {
+            that.messages[room.name].push({
               history: '--- 以上为历史消息 ---',
             });
           }
         }
+        var recent = Util.deepCopy(room);
+        recent.type = 'room';
+        var exist = false;
+        for (var i in that.recentList) {
+          if (that.recentList[i].name == recent.name) {
+            that.recentList.splice(i, 1);
+          }
+        };
+        !exist && (that.recentList.unshift(recent));
       },
       leaveRoom(room) {
         var that = this;
@@ -448,6 +494,16 @@ export default {
         that.current.type = 'person';
         that.current.name = person.nickname;
         that.current.id = person._id;
+
+        var recent = Util.deepCopy(person);
+        recent.type = 'person';
+        var exist = false;
+        for (var i in that.recentList) {
+          if (that.recentList[i]._id == recent._id) {
+            that.recentList.splice(i, 1);
+          }
+        };
+        that.recentList.unshift(recent);
       },
       initCurrent() {
         var that = this;
@@ -713,7 +769,7 @@ img.emoji {
   height: 20px;
 }
 
-@media screen and (max-width: 500px) {
+@media screen and (max-width: 550px) {
   .user-panel {
     position: fixed;
     left: 0;
@@ -721,6 +777,8 @@ img.emoji {
     bottom: 0;
     width: 100%;
     z-index: 1000;
+    border: none;
+    border-radius: 0;
   }
   .chat-panel {
     position: fixed;
@@ -729,6 +787,8 @@ img.emoji {
     bottom: 0;
     width: 100%;
     z-index: 999;
+    border: none;
+    border-radius: 0;
   }
 }
 </style>

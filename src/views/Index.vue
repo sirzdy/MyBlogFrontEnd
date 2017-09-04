@@ -1,9 +1,7 @@
 <template>
   <div v-title data-title="张丹阳">
     <Header></Header>
-    Index{{msg}}
-    <br> {{$router.params}}
-    <button v-on:click="show"></button>
+    Index
   </div>
 </template>
 <script>

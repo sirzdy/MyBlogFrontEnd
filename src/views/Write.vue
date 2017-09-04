@@ -1,167 +1,172 @@
 <template>
-  <div class="panel panel-default write-panel" tabindex="-1" v-title data-title="写文章">
-    <div class="panel-heading" style="padding-left:0;padding-right:0;">
-      <div class="col-xs-12 col-sm-6 col-md-6" style="margin-top:10px">
-        <div class="input-group">
-          <span class="input-group-addon">标题</span>
-          <input type="text" class="form-control" placeholder="请输入标题" v-model="post.title">
+  <div>
+    <div id="menu" @click="toggleMenu"  style="position:fixed;top:-5px;right:-5px;width:20px;height:20px;border-radius:10px;background:#999;z-index:10;color:#999;"></div>
+    <div class="panel panel-default write-panel" tabindex="-1" v-title data-title="写文章">
+      <div class="panel-heading" style="padding-left:0;padding-right:0;padding-top:0px;">
+        <div class="col-xs-12 col-sm-6 col-md-6" style="margin-top:10px">
+          <div class="input-group">
+            <span class="input-group-addon">标题</span>
+            <input type="text" class="form-control" placeholder="请输入标题" v-model="post.title">
+          </div>
+        </div>
+        <div class="col-xs-6 col-sm-3 col-md-3" style="margin-top:10px">
+          <div class="input-group">
+            <span class="input-group-addon">分类</span>
+            <select class="form-control" style="border-radius:0" v-model="post.category">
+              <option value="" v-for="option in categories" v-bind:value="option">{{option.name}}</option>
+            </select>
+            <span class="input-group-addon"><i class="fa fa-plus" style="cursor:pointer;" v-on:click="add=true"></i></span>
+          </div>
+        </div>
+        <div class="col-xs-6 col-sm-3 col-md-3" style="margin-top:10px">
+          <div class="input-group">
+            <span class="input-group-addon">标签</span>
+            <input type="text" class="form-control" placeholder="用分号隔开" v-model="post.tags">
+          </div>
         </div>
       </div>
-      <div class="col-xs-6 col-sm-3 col-md-3" style="margin-top:10px">
-        <div class="input-group">
-          <span class="input-group-addon">分类</span>
-          <select class="form-control" style="border-radius:0" v-model="post.category">
-            <option value="" v-for="option in categories" v-bind:value="option">{{option.name}}</option>
-          </select>
-          <span class="input-group-addon"><i class="fa fa-plus" style="cursor:pointer;" v-on:click="add=true"></i></span>
+      <div class="post-area">
+        <textarea class="form-control  write-area" id="content" v-bind:style="{fontSize:fontSize+'px'}" v-model="post.content" @keyup.ctrl.enter="keyup"></textarea>
+        <div class="preview-area" readonly="" v-show="previewShow">
+          <Preview v-bind:content="post.content"></Preview>
         </div>
       </div>
-      <div class="col-xs-6 col-sm-3 col-md-3" style="margin-top:10px">
-        <div class="input-group">
-          <span class="input-group-addon">标签</span>
-          <input type="text" class="form-control" placeholder="用分号隔开" v-model="post.tags">
-        </div>
-      </div>
-    </div>
-    <div class="post-area">
-      <textarea class="form-control  write-area" id="content" v-bind:style="{fontSize:fontSize+'px'}" v-model="post.content" @keyup.ctrl.enter="keyup"></textarea>
-      <div class="preview-area" readonly="" v-show="previewShow">
-        <Preview v-bind:content="post.content"></Preview>
-      </div>
-    </div>
-    <div class="panel-footer">
-      <div class="alert alert-danger margintop20" role="alert" v-show="err.show"><b>{{err.con}}</b></div>
-      <div class="col-sm-4 col-xs-12 text-center" style="margin-bottom:10px">
-        <!-- <div class="btn-toolbar "> -->
-        <div class="btn-group">
-          <button class="btn btn-default" v-on:click="fullscreenToggleWrite"><i class="fa fa-arrows-alt"></i> 专注</button>
-          <button class="btn btn-default" v-on:click="fullscreenToggle"><i class="fa fa-tv"></i> 全屏</button>
-          <button class="btn btn-default" v-on:click="previewShow=!previewShow"><i class="fa fa-columns"></i> 预览</button>
-        </div>
-      </div>
-      <!-- </div> -->
-      <div class="col-sm-4 col-xs-12 text-center" style="margin-bottom:10px">
-        <!-- <div class="btn-toolbar"> -->
-        <div class="btn-group">
-          <button class="btn btn-default" v-on:click="upload"><i class="fa fa-photo"></i> 传图</button>
-          <button class="btn btn-default" v-on:click="fontSize++"><i class="fa fa-search-plus"></i> 放大</button>
-          <button class="btn btn-default" v-on:click="fontSize--"><i class="fa fa-search-minus"></i> 缩小</button>
+      <div class="panel-footer">
+        <div class="alert alert-danger margintop20" role="alert" v-show="err.show"><b>{{err.con}}</b></div>
+        <div class="col-sm-4 col-xs-12 text-center" style="margin-bottom:10px">
+          <!-- <div class="btn-toolbar "> -->
+          <div class="btn-group">
+            <button class="btn btn-default" v-on:click="fullscreenToggleWrite"><i class="fa fa-arrows-alt"></i> 专注</button>
+            <button class="btn btn-default" v-on:click="fullscreenToggle"><i class="fa fa-tv"></i> 全屏</button>
+            <button class="btn btn-default" v-on:click="previewShow=!previewShow"><i class="fa fa-columns"></i> 预览</button>
+          </div>
         </div>
         <!-- </div> -->
-      </div>
-      <div class="col-sm-4 col-xs-12 text-center" style="margin-bottom:10px">
-        <!-- <div class="btn-toolbar"> -->
-        <div class="btn-group">
-          <button class="btn btn-default" v-on:click="confirm = 'del'" v-if="post._id"><i class="fa fa-trash-o"></i> 删除</button>
-          <button class="btn btn-default" v-on:click="confirm = 'clear'" v-else="!post._id"><i class="fa fa-trash-o"></i> 清空</button>
-          <button class="btn btn-default" v-on:click="save"><i class="fa fa-save"></i> 保存</button>
-          <button class="btn btn-default" v-on:click="publish" v-if="!post._id"><i class="fa fa-send-o"></i> 发布</button>
-          <button class="btn btn-default" v-on:click="update" v-else="post._id"><i class="fa fa-send-o"></i> 更新</button>
+        <div class="col-sm-4 col-xs-12 text-center" style="margin-bottom:10px">
+          <!-- <div class="btn-toolbar"> -->
+          <div class="btn-group">
+            <button class="btn btn-default" v-on:click="upload"><i class="fa fa-photo"></i> 传图</button>
+            <button class="btn btn-default" v-on:click="fontSize++"><i class="fa fa-search-plus"></i> 放大</button>
+            <button class="btn btn-default" v-on:click="fontSize--"><i class="fa fa-search-minus"></i> 缩小</button>
+          </div>
+          <!-- </div> -->
         </div>
-        <!-- </div> -->
+        <div class="col-sm-4 col-xs-12 text-center" style="margin-bottom:10px">
+          <!-- <div class="btn-toolbar"> -->
+          <div class="btn-group">
+            <button class="btn btn-default" v-on:click="confirm = 'del'" v-if="post._id"><i class="fa fa-trash-o"></i> 删除</button>
+            <button class="btn btn-default" v-on:click="confirm = 'clear'" v-else="!post._id"><i class="fa fa-trash-o"></i> 清空</button>
+            <button class="btn btn-default" v-on:click="save"><i class="fa fa-save"></i> 保存</button>
+            <button class="btn btn-default" v-on:click="publish" v-if="!post._id"><i class="fa fa-send-o"></i> 发布</button>
+            <button class="btn btn-default" v-on:click="update" v-else="post._id"><i class="fa fa-send-o"></i> 更新</button>
+          </div>
+          <!-- </div> -->
+        </div>
       </div>
-    </div>
-    <div class="mask" v-show="loading">
-      <i class="fa fa-spinner fa-spin fa-4x loading"></i>
-    </div>
-    <!-- 错误警告-->
-    <div class="mask" id="alert" v-show="alert" tabindex="-1" @keyup.esc="alert=false">
-      <div class="popup">
-        <span class="fa-stack" style="position:absolute;right:15px;top:15px;cursor:pointer" v-on:click="alert=false">
+      <div class="mask" v-show="loading">
+        <i class="fa fa-spinner fa-spin fa-4x loading"></i>
+      </div>
+      <!-- 错误警告-->
+      <div class="mask" id="alert" v-show="alert" tabindex="-1" @keyup.esc="alert=false">
+        <div class="popup">
+          <span class="fa-stack" style="position:absolute;right:15px;top:15px;cursor:pointer" v-on:click="alert=false">
           <i class="fa fa-circle-o fa-stack-2x"></i>
           <i class="fa fa-close fa-stack-1x "></i>
         </span>
-        <div class="popup-con" v-show="alert"><i class="fa fa-warning fa-3x" style="color:#8a6d3b;margin-bottom:10px"></i>
-          <br>{{err.con}}</div>
-        <div class="popup-btn" v-show="alert">
-          <div class="col-xs-6 col-xs-offset-3">
-            <button id="alertConfirm" class="btn btn-primary btn-block" v-on:click="alert=false">确定</button>
+          <div class="popup-con" v-show="alert"><i class="fa fa-warning fa-3x" style="color:#8a6d3b;margin-bottom:10px"></i>
+            <br>{{err.con}}</div>
+          <div class="popup-btn" v-show="alert">
+            <div class="col-xs-6 col-xs-offset-3">
+              <button id="alertConfirm" class="btn btn-primary btn-block" v-on:click="alert=false">确定</button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    <!-- 成功提示 -->
-    <div class="mask" id="alert" v-show="success" tabindex="-1" @keyup.esc="alert=false">
-      <div class="popup">
-        <span class="fa-stack" style="position:absolute;right:15px;top:15px;cursor:pointer" v-on:click="success=false">
+      <!-- 成功提示 -->
+      <div class="mask" id="alert" v-show="success" tabindex="-1" @keyup.esc="alert=false">
+        <div class="popup">
+          <span class="fa-stack" style="position:absolute;right:15px;top:15px;cursor:pointer" v-on:click="success=false">
           <i class="fa fa-circle-o fa-stack-2x"></i>
           <i class="fa fa-close fa-stack-1x "></i>
         </span>
-        <div class="popup-con" v-show="success"><i class="fa fa-check-circle fa-3x" style="color:#3c763d;margin-bottom:10px"></i>
-          <br>
-          <strong v-show="suc.type=='publish'||suc.type=='update'">《{{post.title}}》</strong>
-          <strong v-show="suc.type=='addCategory'">【{{addCategoryName}}】</strong>
-          <br>{{suc.con}}</div>
-        <div class="popup-btn" v-show="suc.type=='publish'||suc.type=='update'">
-          <div class="col-xs-6">
-            <button class="btn btn-primary btn-block" v-on:click="success=false">编辑</button>
+          <div class="popup-con" v-show="success"><i class="fa fa-check-circle fa-3x" style="color:#3c763d;margin-bottom:10px"></i>
+            <br>
+            <strong v-show="suc.type=='publish'||suc.type=='update'">《{{post.title}}》</strong>
+            <strong v-show="suc.type=='addCategory'">【{{addCategoryName}}】</strong>
+            <br>{{suc.con}}</div>
+          <div class="popup-btn" v-show="suc.type=='publish'||suc.type=='update'">
+            <div class="col-xs-6">
+              <button class="btn btn-primary btn-block" v-on:click="success=false">编辑</button>
+            </div>
+            <div class="col-xs-6">
+              <router-link :to="{ name: 'Post', params: { id: post._id }}" id="successView" class="btn btn-primary btn-block" v-on:click="success=false">
+                查看
+              </router-link>
+            </div>
           </div>
-          <div class="col-xs-6">
-            <router-link :to="{ name: 'Post', params: { id: post._id }}" id="successView" class="btn btn-primary btn-block" v-on:click="success=false">
-              查看
-            </router-link>
+          <div class="popup-btn" v-show="suc.type=='publish'||suc.type=='update'||suc.type=='delete'">
+            <div class="col-xs-12">
+              <button class="btn btn-default btn-block" v-on:click="success = false;clear()" id="successMore">再写一篇</button>
+            </div>
           </div>
-        </div>
-        <div class="popup-btn" v-show="suc.type=='publish'||suc.type=='update'||suc.type=='delete'">
-          <div class="col-xs-12">
-            <button class="btn btn-default btn-block" v-on:click="success = false;clear()" id="successMore">再写一篇</button>
-          </div>
-        </div>
-        <div class="popup-btn" v-show="suc.type=='addCategory'">
-          <div class="col-xs-12">
-            <button class="btn btn-default btn-block" v-on:click="success = false;" id="successMore">返回</button>
+          <div class="popup-btn" v-show="suc.type=='addCategory'">
+            <div class="col-xs-12">
+              <button class="btn btn-default btn-block" v-on:click="success = false;" id="successMore">返回</button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    <!-- 确认删除/清空 -->
-    <div class="mask" id="confirm" v-show="confirm" tabindex="-1" @keyup.esc="confirm=false">
-      <div class="popup">
-        <span class="fa-stack" style="position:absolute;right:15px;top:15px;cursor:pointer" v-on:click="confirm=false">
+      <!-- 确认删除/清空 -->
+      <div class="mask" id="confirm" v-show="confirm" tabindex="-1" @keyup.esc="confirm=false">
+        <div class="popup">
+          <span class="fa-stack" style="position:absolute;right:15px;top:15px;cursor:pointer" v-on:click="confirm=false">
           <i class="fa fa-circle-o fa-stack-2x"></i>
           <i class="fa fa-close fa-stack-1x "></i>
         </span>
-        <div class="popup-con" v-if="confirm=='del'"><i class="fa fa-warning fa-3x " style="color:#a94442;margin-bottom:10px"></i>
-          <br>你确定要删除这篇文章吗？
-          <br>删除后将无法恢复。</div>
-        <div class="popup-con" v-if="confirm=='clear'"><i class="fa fa-warning fa-3x " style="color:#a94442;margin-bottom:10px"></i>
-          <br>你确定要清空所有内容吗？
-          <br>清空后将无法恢复。</div>
-        <div class="popup-btn">
-          <div class="col-xs-6">
-            <button class="btn btn-primary btn-block" v-on:click="confirm=false" id="confirmCancel">取消</button>
-          </div>
-          <div class="col-xs-6">
-            <button v-if="confirm=='clear'" class="btn btn-danger btn-block" v-on:click="confirm = false;clear()">确定</button>
-            <button v-if="confirm=='del'" class="btn btn-danger btn-block" v-on:click="confirm = false;del()">确定</button>
+          <div class="popup-con" v-if="confirm=='del'"><i class="fa fa-warning fa-3x " style="color:#a94442;margin-bottom:10px"></i>
+            <br>你确定要删除这篇文章吗？
+            <br>删除后将无法恢复。</div>
+          <div class="popup-con" v-if="confirm=='clear'"><i class="fa fa-warning fa-3x " style="color:#a94442;margin-bottom:10px"></i>
+            <br>你确定要清空所有内容吗？
+            <br>清空后将无法恢复。</div>
+          <div class="popup-btn">
+            <div class="col-xs-6">
+              <button class="btn btn-primary btn-block" v-on:click="confirm=false" id="confirmCancel">取消</button>
+            </div>
+            <div class="col-xs-6">
+              <button v-if="confirm=='clear'" class="btn btn-danger btn-block" v-on:click="confirm = false;clear()">确定</button>
+              <button v-if="confirm=='del'" class="btn btn-danger btn-block" v-on:click="confirm = false;del()">确定</button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    <div class="mask" id="add" v-show="add" tabindex="-1" @keyup.esc="add=false">
-      <div class="popup">
-        <span class="fa-stack" style="position:absolute;right:15px;top:15px;cursor:pointer" v-on:click="add=false">
+      <div class="mask" id="add" v-show="add" tabindex="-1" @keyup.esc="add=false">
+        <div class="popup">
+          <span class="fa-stack" style="position:absolute;right:15px;top:15px;cursor:pointer" v-on:click="add=false">
           <i class="fa fa-circle-o fa-stack-2x"></i>
           <i class="fa fa-close fa-stack-1x "></i>
         </span>
-        <div class="popup-con" style="padding:0 20px;">
-          <i class="fa fa-plus-square-o fa-3x " style="color:#538bb1;margin-bottom:10px"></i>
-          <input type="text" class="form-control" placeholder="请输入类别名" v-model="addCategoryName" style="margin:20px 0 " id="addInput">
-        </div>
-        <div class="popup-btn">
-          <div class="col-xs-6">
-            <button class="btn btn-primary btn-block" v-on:click="add=false">取消</button>
+          <div class="popup-con" style="padding:0 20px;">
+            <i class="fa fa-plus-square-o fa-3x " style="color:#538bb1;margin-bottom:10px"></i>
+            <input type="text" class="form-control" placeholder="请输入类别名" v-model="addCategoryName" style="margin:20px 0 " id="addInput">
           </div>
-          <div class="col-xs-6">
-            <button class="btn btn-primary btn-block" v-on:click="add = false;addCategory()" v-bind:disabled="!addCategoryName">确定</button>
+          <div class="popup-btn">
+            <div class="col-xs-6">
+              <button class="btn btn-primary btn-block" v-on:click="add=false">取消</button>
+            </div>
+            <div class="col-xs-6">
+              <button class="btn btn-primary btn-block" v-on:click="add = false;addCategory()" v-bind:disabled="!addCategoryName">确定</button>
+            </div>
           </div>
         </div>
       </div>
     </div>
+    <Header></Header>
   </div>
 </template>
 <script>
 import router from '../router'
+import Header from '../components/Header.vue'
 import Preview from '../components/Preview.vue'
 
 import '../assets/js/screenfull.js'
@@ -201,7 +206,8 @@ export default {
       }
     },
     components: {
-      Preview
+      Preview,
+      Header
     },
     updated() {
       if (this.confirm) {
@@ -220,12 +226,12 @@ export default {
       if (this.add) {
         $("#addInput").focus();
       }
+      $(".header").hide();
     },
     created() {
       // 组件创建完后获取数据，
       // 此时 data 已经被 observed 了
       if (global.editPostId) {
-        console.log(global.editPostId)
         this.post._id = global.editPostId;
         this.getPost();
         delete global.editPostId;
@@ -239,6 +245,9 @@ export default {
     methods: {
       keyup() {
         console.log(window.event.keyCode);
+      },
+      toggleMenu() {
+        $(".header").toggle();
       },
       initPost() {
         this.post = {
@@ -330,11 +339,10 @@ export default {
           'tags': this.post.tags
         }
         this.$axios.post('/save', params).then(function(response) {
-          console.log(window.location.origin, response.data)
           if (response.data.recode == '0000') {
             var e = document.createElement('a');
             e.href = global.serverUrl + '/' + response.data.path;
-            e.download = (params.title || 'NoTitle') + '.md';
+            e.download = (params.title || 'save') + '.md';
             e.click();
           } else {
             that.alert = "true";
@@ -390,7 +398,6 @@ export default {
         })
       },
       del() {
-        console.log("del");
         var param = {
           _id: this.post._id
         };
@@ -407,7 +414,7 @@ export default {
           }
           that.loading = false;
         }).catch(function(error) {
-          console.log(error);
+          // console.log(error);
         })
       },
       clear() {
@@ -426,7 +433,7 @@ export default {
         };
         this.$axios.post('/post', param).then(function(response) {
           if (response.data.recode === '0000') {
-            console.log("查询成功");
+            // console.log("查询成功");
             var post = response.data.post;
             that.post._id = post._id;
             that.post.title = post.title;
@@ -527,8 +534,8 @@ export default {
   position: absolute;
   top: 140px;
   width: 260px;
-  left:50%;
-  top:50%;
+  left: 50%;
+  top: 50%;
   transform: translateX(-50%) translateY(-50%);
   /*height: 200px;*/
   background: #fff;

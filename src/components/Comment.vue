@@ -2,7 +2,7 @@
   <!-- 评论 -->
   <div>
     <CommentIframe v-bind:commentid="''" v-bind:commentinf="null" @submit-comment="addComment"></CommentIframe>
-    <div class="comment-header">
+    <div class="comment-header" id="comment">
       <span class="comment-label"><i class="fa fa-comments">评论</i></span>
       <span class="flex-row-emp"></span>
       <span class="comment-label"><small>共</small><strong>{{commentList.info.totalSize}}</strong><small>条评论</small></span>
@@ -12,8 +12,8 @@
         暂无评论
       </div>
       <div v-if="commentList.info.totalSize">
-        <div v-for="comment in commentList.list" class="comment-box">
-          <!-- {{comment}} -->
+        <div v-bind:anchorid="comment._id" v-for="comment in commentList.list" class="comment-box">
+          <!-- {{comment._id}} -->
           <div>
             <div class="comment-box-header">
               <img v-bind:src="comment.user.avatar||avatarBaseUrl+'default.png'" style="width:20px;margin-right:5px;"> {{comment.user.nickname||comment.user.email}}
@@ -58,7 +58,7 @@
           <div>
             <div style="padding-left:10px;border-left:5px solid #B0E2FF;">
               <!-- reply list start -->
-              <div style="width:100%;margin-top:10px;" v-if="comment.reply.totalSize" v-for="reply in comment.reply.list">
+              <div v-bind:anchorid="reply._id" style="width:100%;margin-top:10px;" v-if="comment.reply.totalSize" v-for="reply in comment.reply.list">
                 <div class="comment-box-header">
                   <img v-bind:src="reply.user.avatar||avatarBaseUrl+'default.png'" style="width:20px;margin-right:5px;"> {{reply.user.nickname||reply.user.email}}
                   <div class="flex-row-emp"></div>
@@ -80,7 +80,7 @@
                       <span aria-hidden="true">&laquo;</span>
                     </a>
                   </li>
-                  <li v-for="n in comment.reply.pagearr" v-bind:class="{'active':n==comment.reply.page}" v-on:click="n!=comment.reply.page&&getReply(comment._id,comment.reply,n)">
+                  <li v-for="n in comment.reply.pagearr" v-bind:class="{'active':n==comment.reply.page,'disabled':n=='...'}" v-on:click="n!='...'&&n!=comment.reply.page&&getReply(comment._id,comment.reply,n)">
                     <a>{{n}}</a>
                   </li>
                   <li v-bind:class="{'disabled':comment.reply.page==comment.reply.pages}" v-on:click="comment.reply.page!=comment.reply.pages&&getReply(comment._id,comment.reply,comment.reply.page+1)">
@@ -100,8 +100,25 @@
           </div>
           <!-- reply end-->
         </div>
-        <div class="btn btn-block btn-xs btn-default" v-if="commentList.info.more" v-on:click="getComment">加载更多</div>
-        <div style="text-align:center;margin:0;color:#999" v-else>到底了</div>
+        <nav aria-label="Page navigation" class="text-center" v-if="commentList.info.pages>1">
+          <ul class="pagination pagination-sm">
+            <li v-bind:class="{'disabled':commentList.info.page==1}" v-on:click="commentList.info.page!=1&&getComment(commentList.info.page-1)">
+              <a aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+              </a>
+            </li>
+            <li v-for="n in commentList.info.pagearr" v-bind:class="{'active':n==commentList.info.page,'disabled':n=='...'}" v-on:click="n!='...'&&n!=commentList.info.page&&getComment(n)">
+              <a>{{n}}</a>
+            </li>
+            <li v-bind:class="{'disabled':commentList.info.page==commentList.info.pages}" v-on:click="commentList.info.page!=commentList.info.pages&&getComment(commentList.info.page+1)">
+              <a aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+        <!-- <div class="btn btn-block btn-xs btn-default" v-if="commentList.info.more" v-on:click="getComment">加载更多</div>
+        <div style="text-align:center;margin:0;color:#999" v-else>到底了</div> -->
       </div>
     </div>
   </div>
@@ -122,11 +139,13 @@ export default {
         commentList: {
           list: [],
           info: {
+            pagearr: [],
             totalSize: 0,
             erremp: true,
             err: false,
             msg: '',
             page: 0,
+            pages: 0,
             size: 3,
             more: false,
             replySize: 3
@@ -153,7 +172,6 @@ export default {
     },
     created() {
       this.User = global.User;
-      /* 加载评论 */
       this.getComment();
     },
     methods: {
@@ -214,23 +232,35 @@ export default {
         }
         _win.focus();
       },
-      getComment() {
+      getComment(n) {
         var param = {
           postid: this.$route.params.id,
-          page: this.commentList.info.page + 1,
           size: this.commentList.info.size
+        };
+        if (global.floor) {
+          param.floor = global.floor
+          delete global.floor;
+        }
+        if (n) {
+          param.page = n
+        } else {
+          param.page = this.commentList.info.page + 1
         };
         var that = this;
         this.$axios.post('/getComment', param).then(function(response) {
           if (response.data.recode === '0000') {
-            that.commentList.list = that.commentList.list.concat(response.data.res.list);
+            // that.commentList.list = that.commentList.list.concat(response.data.res.list);
+            that.commentList.list = response.data.res.list;
             that.commentList.info.totalSize = response.data.res.totalSize;
-            that.commentList.info.page++;
+            that.commentList.info.page = response.data.page;
+            that.commentList.info.pages = Math.ceil(that.commentList.info.totalSize / that.commentList.info.size);
+            that.commentList.info.pagearr = Util.getPageArr(that.commentList.info.pages, that.commentList.info.page, 8);
             if (Math.ceil(that.commentList.info.totalSize / that.commentList.info.size) <= that.commentList.info.page) {
               that.commentList.info.more = false;
             } else {
               that.commentList.info.more = true;
             }
+
             var list = that.commentList.list;
             for (var i in list) {
               var reply = {
@@ -257,26 +287,31 @@ export default {
           } else if (response.data.recode === '5005') {
             // console.log(response.data)
           } else {
-            console.log("获取评论失败");
+            // console.log("获取评论失败");
           }
         }).catch(function(error) {
-          console.log(error);
+          // console.log(error);
         })
       },
       getReply(id, l, n) {
         n && (l.page = n - 1);
         var param = {
+          postid: this.$route.params.id,
           commentid: id,
           page: l.page + 1,
           size: this.commentList.info.replySize
         };
+        if (global.flr) {
+          param.flr = global.flr
+          delete global.flr;
+        }
         var that = this;
         this.$axios.post('/getReply', param).then(function(response) {
           if (response.data.recode === '0000') {
             //l.list = l.list.concat(response.data.res.list);
             l.list = response.data.res.list;
             l.totalSize = response.data.res.totalSize;
-            l.page++;
+            l.page = response.data.page;
             l.pages = Math.ceil(l.totalSize / that.commentList.info.replySize);
             l.pagearr = Util.getPageArr(l.pages, l.page, 6);
             if (Math.ceil(l.totalSize / that.commentList.info.replySize) <= l.page) {
@@ -284,17 +319,28 @@ export default {
             } else {
               l.more = true;
             }
+            setTimeout(function() {
+              if (global.anchor) {
+                Util.scroll()
+              }
+            }, 100)
           } else if (response.data.recode === '5005') {
             // console.log(response.data)
+            setTimeout(function() {
+              if (global.anchor) {
+                Util.scroll()
+              }
+            }, 100)
           } else {
-            console.log("获取回复失败");
+            // console.log("获取回复失败");
           }
         }).catch(function(error) {
-          console.log(error);
+          // console.log(error);
         })
+
+
       },
       likeComment(comment) {
-        console.log(comment)
         var that = this;
         if (!this.User._id) {
           comment.likeinfo.error = true;
@@ -332,7 +378,6 @@ export default {
 </style>
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-
 .comment-box {
   width: 100%;
   margin: 20px 0;

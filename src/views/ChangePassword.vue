@@ -83,7 +83,7 @@ export default {
       this.verify.loading = true;
       this.verify.disabled = true;
       this.$axios.post('/verifyEmail', param).then(function(response) {
-      	console.log(response);
+      	// console.log(response);
         if (response.data.recode === '0000') {
           that.verify.loading = false;
           that.verify.disabled = false;
@@ -97,7 +97,7 @@ export default {
         }
         return;
       }).catch(function(error) {
-        console.log(error);
+        // console.log(error);
         that.verify.loading = false;
         that.verify.disabled = false;
         that.err.con = '获取验证码失败。请核对邮箱或稍后再试。';

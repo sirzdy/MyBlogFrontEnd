@@ -198,7 +198,6 @@ export default {
           };
         } else {
           for (var i in that.queryTime) {
-            console.log(i, that.queryTime[i]);
             if (that.queryTime[i]) {
               if (/Start/.test(i)) {
                 that.query[i] = that.queryTime[i];
@@ -226,28 +225,26 @@ export default {
             publishTime: -1
           }
         }
-        console.log(param);
         that.loading = true;
         that.loaded = false;
         that.result = {};
         that.result.list = [];
         this.$axios.post('/search', param).then(function(response) {
           if (response.data.recode === '0000') {
-            console.log("查询成功");
+            // console.log("查询成功");
             // that.postsList = response.data.res.list;
             // that.totalSize = response.data.res.totalSize;
             that.result = response.data.res;
             that.listinfo.pages = Math.ceil(that.result.totalSize / that.listinfo.size);
             that.listinfo.page = page ? page : 1;
             that.initPageArr();
-            console.log(that.result);
           } else if (response.data.recode == '5005') {
-            console.log("未找到相关记录");
+            // console.log("未找到相关记录");
           }
           that.loading = false;
           that.loaded = true;
         }).catch(function(error) {
-          console.log(error);
+          // console.log(error);
           that.loading = false;
         })
       }

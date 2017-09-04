@@ -165,7 +165,6 @@ export default {
     },
     saveAva: function() {
       var that = this;
-      console.log(this.avatar.value)
       if (this.avatar && this.avatar.value != '0') {
         var params = {
           avatar: this.avatar.url
@@ -190,7 +189,6 @@ export default {
             var params = {
               avatar: that.serverUrl + response.data.path
             };
-            console.log(params);
             that.postSave(params);
 
           } else {
@@ -211,6 +209,11 @@ export default {
         this.failinfo.show = true;
         this.failinfo.msg = '未登录';
         return false;
+      }
+      if (this.userinfo.nickname.length > 20) {
+        this.failinfo.show = true;
+        this.failinfo.msg = '昵称不得超过20位';
+        return;
       }
       for (var i in this.userinfo) {
         if (this.userinfo[i] && this.userinfo[i] != this.User[i] && i != 'avatar') {

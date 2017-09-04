@@ -1,5 +1,5 @@
 <template>
-  <div >
+  <div>
     <div class="post">
       <div class="text-center" v-if="loading">
         <i class="fa fa-spinner fa-spin fa-2x"></i>
@@ -45,8 +45,8 @@
                 </div>
                 <div class="flex-column-emp flex-column">
                   <div>
-                    <i class="fa fa-mars" v-if="post.author.sex=='m'"> </i> 
-                    <i class="fa fa-venus" v-if="post.author.sex=='f'"> </i> 
+                    <i class="fa fa-mars" v-if="post.author.sex=='m'"> </i>
+                    <i class="fa fa-venus" v-if="post.author.sex=='f'"> </i>
                     <span v-if="post.author.birthday">{{post.author.birthday|getAge('y')}}岁</span>
                     <a v-bind:href="'mailto:'+post.author.email"><i class="fa fa-envelope"  ></i></a>
                   </div>
@@ -113,7 +113,7 @@ export default {
     created() {
       this.getPost();
       this.User = global.User;
-      this.avatarBaseUrl=global.avatarBaseUrl;
+      this.avatarBaseUrl = global.avatarBaseUrl;
     },
     updated() {
       this.post && $('#preview').html(markdown.toHTML(this.post.content));
@@ -183,12 +183,12 @@ export default {
             }
             // $('#preview').html(markdown.toHTML(that.post.content));
           } else if (response.data.recode == '5005') {
-            console.log("文章不存在");
+            // console.log("文章不存在");
             that.error = true;
           }
           that.loading = false;
         }).catch(function(error) {
-          console.log(error);
+          // console.log(error);
           // that.error = error.toString()
           that.error = true;
           that.loading = false;
@@ -220,7 +220,7 @@ export default {
           if (response.data.recode === '0000') {
             that.post.author = response.data.user;
           } else if (response.data.recode == '5005') {
-            console.log("不存在");
+            // console.log("不存在");
           }
         }).catch(function(error) {
           // console.log(error);

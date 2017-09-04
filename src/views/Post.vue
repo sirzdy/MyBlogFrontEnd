@@ -1,5 +1,5 @@
 <template>
-  <div >
+  <div>
     <Header></Header>
     <div class="post-box">
       <Content></Content>
@@ -8,6 +8,7 @@
   </div>
 </template>
 <script>
+import Util from '../assets/js/util.js'
 import Header from '../components/Header.vue'
 import Content from '../components/Content.vue'
 import Comment from '../components/Comment.vue'

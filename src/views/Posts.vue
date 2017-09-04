@@ -162,7 +162,6 @@ export default {
           };
         } else {
           for (var i in that.queryTime) {
-            console.log(i, that.queryTime[i]);
             if (that.queryTime[i]) {
               if (/Start/.test(i)) {
                 that.query[i] = that.queryTime[i];
@@ -177,7 +176,6 @@ export default {
           }
           var param = that.query;
         }
-        console.log(param)
         param.size = that.listinfo.size;
         param.page = page ? page : 1;
         if (that.order == 'heat') {
@@ -197,7 +195,7 @@ export default {
         that.result.list = [];
         this.$axios.post('/search', param).then(function(response) {
           if (response.data.recode === '0000') {
-            console.log("查询成功");
+            // console.log("查询成功");
             // that.postsList = response.data.res.list;
             // that.totalSize = response.data.res.totalSize;
             that.result = response.data.res;
@@ -205,12 +203,12 @@ export default {
             that.listinfo.page = page ? page : 1;
             that.initPageArr();
           } else if (response.data.recode == '5005') {
-            console.log("未找到相关记录");
+            // console.log("未找到相关记录");
           }
           that.loading = false;
           that.loaded = true;
         }).catch(function(error) {
-          console.log(error);
+          // console.log(error);
           that.loading = false;
         })
       }

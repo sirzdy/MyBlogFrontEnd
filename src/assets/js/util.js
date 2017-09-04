@@ -204,18 +204,34 @@ var Util = {
       var e = window.event;
       event.stopPropagation();
       document.body.removeChild(m);
+      clearTimeout(removeTimeout);
     }
     m.onclick = function() {
       fn && fn();
     }
     document.body.appendChild(m);
     m.appendChild(close);
+    var removeTimeout;
     setTimeout(function() {
       var d = 0.5;
       m.style.webkitTransition = '-webkit-transform ' + d + 's ease-in, opacity ' + d + 's ease-in';
       m.style.opacity = '0';
-      setTimeout(function() { document.body.removeChild(m) }, d * 1000);
+      removeTimeout = setTimeout(function() { document.body.removeChild(m) }, d * 1000);
     }, duration);
+  },
+  scroll: function() {
+    if (!$(global.anchor).length) {
+      global.anchor = '#comment';
+    }
+    $("html, body").animate({
+      scrollTop: $(global.anchor).offset().top + "px"
+    }, {
+      duration: 500,
+      easing: "swing"
+    });
+    console.log($(global.anchor).text());
+    $(global.anchor).css({ 'font-weight': 'bold' });
+    delete global.anchor;
   }
 }
 module.exports = Util;

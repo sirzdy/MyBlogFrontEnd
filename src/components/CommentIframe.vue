@@ -82,6 +82,7 @@ export default {
       }
       var that = this;
       var commentBody = _win.document.getElementsByTagName('body')[0];
+
       var content = Util.commentToSave(commentBody.innerHTML);
       if (!content) {
         this.commentinfo.error = true;
@@ -97,47 +98,46 @@ export default {
           if (response.data.recode === '0000') {
             that.commentinfo.suc = true;
             that.commentinfo.msg = response.data.msg;
-            console.log("评论成功");
+            // console.log("评论成功");
             commentBody.innerHTML = '';
-            console.log(response.data.comment);
             that.$emit('submit-comment', response.data.comment);
           } else if (response.data.recode === '5001') {
-            console.log(response.data)
             that.commentinfo.errsign = true;
           } else {
-            console.log("评论失败");
+            // console.log("评论失败");
             that.commentinfo.error = true;
             that.commentinfo.msg = response.data.msg;
           }
           that.loading = false;
         }).catch(function(error) {
-          console.log(error);
+          // console.log(error);
         })
       } else {
-        console.log(id);
         var param = {
           postid: this.$route.params.id,
           commentid: id,
           content: content
         };
+        if ($(commentBody).find('[user]').length) {
+          param.atid = $($(commentBody).find('[user]')[0]).attr('user');
+        };
         this.$axios.post('/reply', param).then(function(response) {
           if (response.data.recode === '0000') {
             that.commentinfo.suc = true;
             that.commentinfo.msg = response.data.msg;
-            console.log("回复成功");
+            // console.log("回复成功");
             commentBody.innerHTML = '';
             that.$emit('submit-comment', response.data.reply, that.commentinf);
           } else if (response.data.recode === '5001') {
-            console.log(response.data)
             that.commentinfo.errsign = true;
           } else {
-            console.log("回复失败");
+            // console.log("回复失败");
             that.commentinfo.error = true;
             that.commentinfo.msg = response.data.msg;
           }
           that.loading = false;
         }).catch(function(error) {
-          console.log(error);
+          // console.log(error);
         })
       }
     }

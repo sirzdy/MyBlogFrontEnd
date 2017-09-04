@@ -16,13 +16,12 @@
       </div>
       <router-link class="header-link header-link-btn" :to="{ name: 'Signin'}" v-if="!User._id">登录</router-link>
       <div v-if="User._id" tabindex="-1" style="outline:none;padding:5px;" id="header-hor-dropdown-menu-div" v-on:click="toggleMenu()" v-on:blur="toggleMenu(false)">
-        <img v-bind:src="User.avatar||avatarBaseUrl+'default.png'" class="img-rounded" style="width:28px;height:28px;cursor:pointer;">
-        <span class="badge">4</span>
+        <img v-bind:src="User.avatar||avatarBaseUrl+'default.png'" class="img-rounded" style="width:30px;height:30px;cursor:pointer;">
         <ul id="header-hor-dropdown-menu" class="header-hor-dropdown-menu">
           <li v-on:click="goWrite">
             <i class="fa fa-pencil fa-fw "></i> 写文章
           </li>
-          <li>
+          <li data-toggle="modal" data-target="#msgs">
             <i class="fa fa-envelope-o fa-fw"></i> 我的消息
           </li>
           <li data-toggle="modal" data-target="#inf">
@@ -36,6 +35,7 @@
           </li>
         </ul>
       </div>
+      <span class="badge" style="position:absolute;top:8px;right:16px;padding:2px" v-if="msgs&&msgs.length" data-toggle="modal" data-target="#msgs">{{msgs.length}}</span>
       <!-- <a class="header-link header-link-btn" :to="{}" v-on:click="signout" v-if="User._id" style="cursor:pointer">登出</a> -->
     </div>
     <!-- 大屏 header end -->
@@ -53,6 +53,7 @@
         </router-link>
         <img @click="myMenuShow=!myMenuShow" v-if="User._id" v-bind:src="User.avatar||avatarBaseUrl+'default.png'" class="img-rounded" style="width:28px;height:28px;cursor:pointer;">
         <!-- <i class="fa fa-user fa-lg fa-fw"></i> -->
+        <span class="badge" style="position:absolute;top:8px;right:8px;padding:2px" v-if="msgs&&msgs.length">{{msgs.length}}</span>
       </div>
       <div class="header-ver-content" ontouchmove="return false;" v-show="menuShow">
         <div class="header-ver-brand"></div>
@@ -84,19 +85,19 @@
       <div class="header-ver-content" ontouchmove="return false;" v-show="myMenuShow">
         <img v-bind:src="User.avatar||avatarBaseUrl+'default.png'" style="width:80px;margin:40px auto">
         <ul class="header-ver-menu">
-          <li v-on:click="goWrite">
+          <li v-on:click="goWrite" @click="myMenuShow=false">
             <i class="fa fa-pencil fa-fw "></i> 写文章
           </li>
-          <li>
+          <li data-toggle="modal" data-target="#msgs" @click="myMenuShow=false">
             <i class="fa fa-envelope-o fa-fw"></i> 我的消息
           </li>
-          <li data-toggle="modal" data-target="#inf" @click="">
+          <li data-toggle="modal" data-target="#inf" @click="myMenuShow=false">
             <i class="fa fa-address-card-o fa-fw"></i> 修改信息
           </li>
-          <li v-on:click="goChangePassword">
+          <li v-on:click="goChangePassword" @click="myMenuShow=false">
             <i class="fa fa-key fa-fw"></i> 修改密码
           </li>
-          <li v-on:click="signout">
+          <li v-on:click="signout" @click="myMenuShow=false">
             <i class="fa fa-sign-out fa-fw"></i> 退出
           </li>
         </ul>
@@ -116,10 +117,46 @@
     <!-- 资料面板 start-->
     <Information v-bind:User="User" @save-inf="saveInf"></Information>
     <!-- 资料面板 end-->
+    <div class="modal fade" id="msgs" tabindex="-1" role="dialog">
+      <div class="modal-dialog " role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+            </button>
+            <h4 class="modal-title" id="myModalLabel">我的消息</h4>
+          </div>
+          <div class="modal-body">
+            <div class="panel panel-info">
+              <div class="panel-heading">
+                未读消息
+                <button @click="readMsgs" class="btn btn-default btn-xs">全部标为已读</button>
+              </div>
+              <div class="panel-body">
+                <div class="list-group">
+                  <button v-if="!msgs.length" data-dismiss="modal" type="button" class="list-group-item">
+                    暂无未读消息
+                  </button>
+                  <button data-dismiss="modal" type="button" class="list-group-item" v-for="msg in reverseMsgs" @click="goMsg(msg);">
+                    <div>{{msg.time|formatTime}}</div>
+                    <div v-html="msg.msg"></div>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <div class="list-group">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 <script>
 import Information from '../components/Information.vue';
+import Util from '../assets/js/util.js'
 
 export default {
   // props: ['User'],
@@ -128,6 +165,7 @@ export default {
         module: 'Index',
         keyword: '',
         User: {},
+        msgs: [],
         menuShow: false,
         myMenuShow: false,
         avatarBaseUrl: ''
@@ -136,10 +174,32 @@ export default {
     created() {
       this.User = global.User;
       this.module = global.module;
-      this.avatarBaseUrl = global.avatarBaseUrl
+      this.avatarBaseUrl = global.avatarBaseUrl;
+      var that = this;
+      if (global.User) {
+        that.getMsgs();
+      }
+      if (global.socket) {
+        global.socket.on('mes', function(data) {
+          that.getMsgs();
+          Util.msg(data.msg, function() {
+            that.goMsg(data);
+          }, 2000);
+        });
+      }
+    },
+    computed: {
+      // 一个计算属性的 getter
+      reverseMsgs: function() {
+        // `this` 指向 vm 实例
+        return this.msgs.reverse()
+      }
     },
     components: {
       Information
+    },
+    filters: {
+      formatTime: Util.formatTime
     },
     methods: {
       toggleMenu: function(sign) {
@@ -169,10 +229,117 @@ export default {
         global.keyword = this.keyword;
         this.$router.push('/Search');
       },
+      getMsgs: function() {
+        var that = this;
+        this.$axios.post('/getMsgs').then(function(response) {
+          if (response.data.recode === '0000') {
+            that.msgs = response.data.list;
+          }
+        }).catch(function(error) {
+          // console.log(error);
+        })
+      },
+      readMsgs: function() {
+        var that = this;
+        this.$axios.post('/readMsgs').then(function(response) {
+          if (response.data.recode === '0000') {
+            // that.getMsgs();
+            that.msgs = [];
+          }
+        }).catch(function(error) {
+          // console.log(error);
+        })
+      },
+      goMsg: function(data) {
+        var that = this;
+        this.$axios.post('/readMsg', {
+          _id: data._id
+        }).then(function(response) {
+          if (response.data.recode === '0000') {
+            that.getMsgs();
+          }
+        }).catch(function(error) {
+          // console.log(error);
+        })
+        if (data.commentid) {
+          global.floor = data.floor;
+          global.anchor = "[anchorId='" + data.commentid + "']";
+          if (/^\/Post/.test(that.$router.history.current.path)) {
+            if (!$(global.anchor).length) {
+              global.transition = {
+                name: 'Post',
+                params: {
+                  id: data.postid
+                }
+              }
+              that.$router.push({
+                name: 'Transition'
+              });
+            } else {
+              Util.scroll()
+            }
+          } else {
+            that.$router.push({
+              name: 'Post',
+              params: {
+                id: data.postid
+              }
+            });
+          };
+        } else if (data.replyid) { //回复
+          global.floor = data.floor;
+          global.flr = data.flr;
+          global.anchor = "[anchorid='" + data.replyid + "']";
+          if (/^\/Post/.test(that.$router.history.current.path)) {
+            if (!$(global.anchor).length) {
+              global.transition = {
+                name: 'Post',
+                params: {
+                  id: data.postid
+                }
+              }
+              that.$router.push({
+                name: 'Transition'
+              });
+            } else {
+              Util.scroll()
+            }
+          } else {
+            that.$router.push({
+              name: 'Post',
+              params: {
+                id: data.postid
+              }
+            });
+          };
+        } else { //喜欢文章
+          if (/^\/Post/.test(that.$router.history.current.path)) {
+            global.transition = {
+              name: 'Post',
+              params: {
+                id: data.postid
+              }
+            }
+            that.$router.push({
+              name: 'Transition'
+            });
+          } else {
+            that.$router.push({
+              name: 'Post',
+              params: {
+                id: data.postid
+              }
+            });
+          }
+        }
+
+      },
       signout: function() {
         this.$axios.post('/signout').then(function(response) {
           if (response.data.recode === '0000') {
             // console.log("登出成功");
+            global.socket.disconnect();
+            delete global.socket;
             window.location.reload();
           }
         }).catch(function(error) {
@@ -185,6 +352,10 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 /* 大屏幕导航条 start */
+
+.header {
+  position: relative;
+}
 
 .header-hor {
   height: 50px;
