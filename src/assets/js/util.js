@@ -179,11 +179,22 @@ var Util = {
       return dateDiff;
     }
   },
-  hint: function(msg, duration) {
+  hint: function(msg, duration, type) {
     duration = isNaN(duration) ? 3000 : duration;
     var m = document.createElement('div');
     m.innerHTML = msg;
-    m.style.cssText = "width: 60%;min-width: 150px;opacity: 0.7;height: 30px;color: rgb(255, 255, 255);line-height: 30px;text-align: center;border-radius: 5px;position: fixed;top: 50px;left: 50%;transform:translateX(-50%);z-index: 999999;background: rgb(0, 0, 0);font-size: 12px;";
+    var backgroundColor;
+    if (type == 'suc') {
+      backgroundColor = "#3c763d";
+      color = "#ffffff";
+    } else if (type == 'fail') {
+      backgroundColor = "#8a6d3b";
+      color = "#ffffff";
+    } else {
+      backgroundColor = "#1296db";
+      color = "#ffffff";
+    }
+    m.style.cssText = "width: 60%;min-width: 150px;opacity: 0.9;height: 30px;color: " + color + ";line-height: 30px;text-align: center;border-radius: 5px;position: fixed;top: 60px;left: 50%;transform:translateX(-50%);z-index: 999999;background: " + backgroundColor + ";font-size: 12px;";
     document.body.appendChild(m);
     setTimeout(function() {
       var d = 0.5;
@@ -200,15 +211,6 @@ var Util = {
     var close = document.createElement('i');
     close.className = "fa fa-close";
     close.style.cssText = "position:absolute;right:5px;top:5px;";
-    close.onclick = function() {
-      var e = window.event;
-      event.stopPropagation();
-      document.body.removeChild(m);
-      clearTimeout(removeTimeout);
-    }
-    m.onclick = function() {
-      fn && fn();
-    }
     document.body.appendChild(m);
     m.appendChild(close);
     var removeTimeout;
@@ -218,6 +220,15 @@ var Util = {
       m.style.opacity = '0';
       removeTimeout = setTimeout(function() { document.body.removeChild(m) }, d * 1000);
     }, duration);
+    close.onclick = function() {
+      var e = window.event;
+      event.stopPropagation();
+      document.body.removeChild(m);
+      clearTimeout(removeTimeout);
+    }
+    m.onclick = function() {
+      fn && fn();
+    }
   },
   scroll: function() {
     if (!$(global.anchor).length) {

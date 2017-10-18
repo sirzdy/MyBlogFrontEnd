@@ -66,6 +66,7 @@ export default {
         _win.focus();
         _win.document.execCommand('InsertHtml', '', '<img src=' + e.target.src + ' style="width:20px;height:20px;">');
       }
+        _win.blur();
     },
     initCommentinfo() {
       this.commentinfo.error = false;

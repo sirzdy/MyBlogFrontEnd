@@ -124,7 +124,7 @@
               </div>
             </div>
           </div>
-          <div class="chat-panel-foot flex-column">
+          <div class="chat-panel-foot flex-column" id="chatIframeBox" tabindex="-1" style="outline:none;">
             <div class="chat-tools flex-row flex-start">
               <i tabindex="-1" class="fa fa-smile-o fa-lg fa-fw chat-tool" style="position: relative;outline:none;" v-on:click="toggleExpression($event)" v-on:blur="toggleExpression($event,false)">
                 <div class="expression" style="cursor:auto;" onselect="return false">
@@ -145,7 +145,8 @@
               <div class="flex-row-emp"></div>
               <button class="btn btn-default" id="send" v-on:click="send($event)"><i class="fa fa-send-o"></i> 发送</button>
             </div>
-            <iframe class="chat-iframe" frameborder="0" height="99" placeholder="请输入内容..." contenteditable="true">
+            <iframe class="chat-iframe" frameborder="0" height="99" placeholder="请输入内容...">
+              <!-- contenteditable="true" -->
             </iframe>
           </div>
         </div>
@@ -206,7 +207,22 @@ export default {
         var div = document.getElementById('mesArea' + this.current.id);
         div && (div.scrollTop = div.scrollHeight);
       }
-      this.activeChatIframe();
+      var that = this;
+      if ($('.chat-iframe').length > 0) {
+        var obj = $('.chat-iframe')[0].contentWindow.document;
+        $(obj).find('body').off('click').on('click', function(e) {
+          var element = this;
+          if (obj.designMode == 'off') {
+            obj.designMode = 'on';
+            $(element).focus();
+          } else {
+            return;
+          }
+        })
+      }
+      if ($('.chat-iframe').length) {
+        this.activeChatIframe();
+      }
     },
     created() {
       this.expression.emoji.url = global.expression.emoji;
@@ -227,19 +243,31 @@ export default {
     },
     methods: {
       activeChatIframe() {
+        console.log('activeChatIframe')
         var that = this;
         var doms = $('.chat-iframe');
         var sendBtn = $("#send");
-        for (var i = 0, len = doms.length; i < len; i++) {
-          var _win = doms[i].contentWindow; // 我们用 _win 变量代替 iframe window
-          var _doc = _win.document; // 用 _doc 变量代替 iframe的document 
-          _doc.designMode = 'On';
-          $(_doc).off('keydown').keydown(function(e) {
+        // for (var i = 0, len = doms.length; i < len; i++) {
+        var _win = doms[0].contentWindow; // 我们用 _win 变量代替 iframe window
+        var _doc = _win.document; // 用 _doc 变量代替 iframe的document 
+        _doc.designMode = 'On';
+        $(_doc).off('keydown').on('keydown', function(e) {
+            console.log(e)
             if ((e.keyCode == '13' && e.metaKey) || (e.keyCode == '13' && e.ctrlKey)) {
               sendBtn.click();
             }
           })
-        }
+          // }
+      },
+      inactiveChatIframe() {
+        console.log('inactiveChatIframe')
+        var that = this;
+        var doms = $('.chat-iframe');
+        // for (var i = 0, len = doms.length; i < len; i++) {
+        var _win = doms[0].contentWindow; // 我们用 _win 变量代替 iframe window
+        var _doc = _win.document; // 用 _doc 变量代替 iframe的document 
+        _doc.designMode = 'Off';
+        // }
       },
       toggleExpression(e, sign) {
         if (sign === true) {
@@ -292,6 +320,7 @@ export default {
           });
         }
         _win.document.getElementsByTagName('body')[0].innerHTML = '';
+        $('.chat-iframe').blur();
       },
       clear() {
         this.messages[this.current.id] = [];
@@ -303,7 +332,8 @@ export default {
         // that.socket.on('chat info', function() {
         //   that.socket.emit('chat info', that.User);
         // })
-        that.socket = io.connect(that.serverUrl + 'chat');
+        // that.socket = io.connect(that.serverUrl + 'chat');
+        that.socket = io(global.chatServerUrl + '/chat');
         global.chatSocket = that.socket;
         that.socket.on('connect', function() {
           that.socket.on('chat info', function() {
@@ -398,8 +428,9 @@ export default {
           })
           that.socket.on('log in', function(data) {
             if (that.socketInfo && that.socketInfo._id == data.logInInfo._id /*&& that.socketInfo.id != data.id*/ ) {
-              alert("您已经在其他地方登录，被签退。")
               that.logOut();
+              Util.hint('您已经在其他地方登录，被签退。', 1500);
+              // alert("您已经在其他地方登录，被签退。")
               return;
             } else if (!that.socketInfo) {
               that.socketInfo = data.logInInfo;

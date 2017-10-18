@@ -1,23 +1,24 @@
 <template>
   <div v-title data-title="文集">
     <Header></Header>
+    <Top></Top>
     <div style="height:20px;"></div>
     <div style="max-width:1000px;margin:0 auto;">
       <div class="col-md-3 col-sm-4">
-        <div class="panel panel-primary">
+        <div class="panel panel-info">
           <div class="panel-heading">
             分类
           </div>
           <div class="panel-body">
             <div class="text-center">
               <div class="list-group">
-                <a style="cursor:pointer;" class="list-group-item" v-bind:class="{'active':!query.category}" v-on:click="mode=true;query.category='';search()">全部</a>
-                <a v-for="c in categories" style="cursor:pointer;" class="list-group-item" v-bind:class="{'active':c._id==query.category}" v-on:click="mode=true;query.category=c._id;search()">{{c.name}}</a>
+                <a style="cursor:pointer;" class="list-group-item" v-bind:class="{'list-group-item-active':!query.category}" v-on:click="mode=true;query.category='';search()">全部</a>
+                <a v-for="c in categories" style="cursor:pointer;" class="list-group-item" v-bind:class="{'list-group-item-active':c._id==query.category}" v-on:click="mode=true;query.category=c._id;search()">{{c.name}}</a>
               </div>
             </div>
           </div>
         </div>
-        <div class="panel panel-primary">
+        <div class="panel panel-info">
           <div class="panel-heading">
             排序方式
           </div>
@@ -32,7 +33,7 @@
             </div>
           </div>
         </div>
-        <div class="panel panel-primary">
+        <div class="panel panel-info">
           <div class="panel-heading">
             搜索
           </div>
@@ -54,7 +55,7 @@
         </div>
         <div v-show="!loading&&result.list.length>0">
           <div class="col-xs-12">
-            <div class="alert alert-success">共找到<strong>【{{result.totalSize}}】</strong>条记录，当前显示第【{{result.start}}】-【{{result.end}}】</strong>条记录</div>
+            <div class="alert alert-info">共找到<strong>【{{result.totalSize}}】</strong>条记录，当前显示第【{{result.start}}】-【{{result.end}}】</strong>条记录</div>
           </div>
           <div v-for="post in result.list">
             <Brief v-bind:post="post"></Brief>
@@ -90,6 +91,7 @@
 </template>
 <script>
 import Header from '../components/Header.vue';
+import Top from '../components/Top.vue';
 import Brief from '../components/Brief.vue';
 import Util from '../assets/js/util.js'
 export default {
@@ -122,6 +124,7 @@ export default {
     },
     components: {
       Header,
+      Top,
       Brief
     },
     created() {
@@ -217,4 +220,12 @@ export default {
 </script>
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.list-group-item-active {
+  background: #ddedf6;
+  color:#555;
+}
+.list-group-item:hover{
+  background: #ddedf6;
+  color:#555;
+}
 </style>

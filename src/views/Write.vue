@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div id="menu" @click="toggleMenu"  style="position:fixed;top:-5px;right:-5px;width:20px;height:20px;border-radius:10px;background:#999;z-index:10;color:#999;"></div>
+    <div id="menu" @click="toggleMenu" style="position:fixed;top:-5px;right:-5px;width:20px;height:20px;border-radius:10px;background:#999;z-index:10;color:#999;"></div>
     <div class="panel panel-default write-panel" tabindex="-1" v-title data-title="写文章">
       <div class="panel-heading" style="padding-left:0;padding-right:0;padding-top:0px;">
         <div class="col-xs-12 col-sm-6 col-md-6" style="margin-top:10px">
@@ -31,32 +31,34 @@
           <Preview v-bind:content="post.content"></Preview>
         </div>
       </div>
-      <div class="panel-footer">
+      <div class="panel-footer" style="padding:10px 0 0 0;">
         <div class="alert alert-danger margintop20" role="alert" v-show="err.show"><b>{{err.con}}</b></div>
-        <div class="col-sm-4 col-xs-12 text-center" style="margin-bottom:10px">
+        <div class="col-sm-4 col-xs-12 text-center" style="margin-bottom:10px;padding:0;">
           <!-- <div class="btn-toolbar "> -->
-          <div class="btn-group">
+          <div class="btn-group btn-group-sm">
             <button class="btn btn-default" v-on:click="fullscreenToggleWrite"><i class="fa fa-arrows-alt"></i> 专注</button>
             <button class="btn btn-default" v-on:click="fullscreenToggle"><i class="fa fa-tv"></i> 全屏</button>
             <button class="btn btn-default" v-on:click="previewShow=!previewShow"><i class="fa fa-columns"></i> 预览</button>
           </div>
         </div>
         <!-- </div> -->
-        <div class="col-sm-4 col-xs-12 text-center" style="margin-bottom:10px">
+        <div class="col-sm-4 col-xs-12 text-center" style="margin-bottom:10px;padding:0;">
           <!-- <div class="btn-toolbar"> -->
-          <div class="btn-group">
+          <div class="btn-group btn-group-sm">
             <button class="btn btn-default" v-on:click="upload"><i class="fa fa-photo"></i> 传图</button>
             <button class="btn btn-default" v-on:click="fontSize++"><i class="fa fa-search-plus"></i> 放大</button>
             <button class="btn btn-default" v-on:click="fontSize--"><i class="fa fa-search-minus"></i> 缩小</button>
           </div>
           <!-- </div> -->
         </div>
-        <div class="col-sm-4 col-xs-12 text-center" style="margin-bottom:10px">
+        <div class="col-sm-4 col-xs-12 text-center" style="margin-bottom:10px;padding:0;">
           <!-- <div class="btn-toolbar"> -->
-          <div class="btn-group">
+          <div class="btn-group btn-group-sm">
             <button class="btn btn-default" v-on:click="confirm = 'del'" v-if="post._id"><i class="fa fa-trash-o"></i> 删除</button>
             <button class="btn btn-default" v-on:click="confirm = 'clear'" v-else="!post._id"><i class="fa fa-trash-o"></i> 清空</button>
-            <button class="btn btn-default" v-on:click="save"><i class="fa fa-save"></i> 保存</button>
+            <button class="btn btn-default" v-on:click="download"><i class="fa fa-download"></i> 下载</button>
+            <button class="btn btn-default" v-on:click="getDrafts" data-toggle="modal" data-target="#drafts"><i class="fa fa-save"></i> 草稿</button>
+            <button class="btn btn-default" v-on:click="saveDraft"><i class="fa fa-save"></i> 保存</button>
             <button class="btn btn-default" v-on:click="publish" v-if="!post._id"><i class="fa fa-send-o"></i> 发布</button>
             <button class="btn btn-default" v-on:click="update" v-else="post._id"><i class="fa fa-send-o"></i> 更新</button>
           </div>
@@ -161,6 +163,43 @@
         </div>
       </div>
     </div>
+    <div class="modal fade" tabindex="-1" role="dialog" id="drafts">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">
+            草稿箱
+            <button @click="deleteDrafts" class="btn btn-default btn-xs" v-if="drafts.length">清空草稿箱</button>
+            </h4>
+          </div>
+          <div class="modal-body">
+            <div class="text-center" v-if="draftLoading">
+              <i class="fa fa-spinner fa-spin fa-2x"></i>
+            </div>
+            <div class="panel-body">
+              <div class="list-group">
+                <button v-if="!drafts.length" data-dismiss="modal" type="button" class="list-group-item">
+                  暂无草稿
+                </button>
+                <button type="button" class="list-group-item" v-for="draft in drafts" style="line-height:30px;">
+                  <span class="label label-info" data-toggle="tooltip" data-placement="top" title="分类"><i class="fa fa-bookmark"></i> {{categoriesName[draft.category]||'未分类'}}</span>
+                  <span data-toggle="tooltip" data-placement="top" title="标题">《{{ draft.title }}》 </span>
+                  <div style="color:#999">保存时间：{{draft.saveTime|formatTime}}</div>
+                  <div>
+                    <button type="button" class="btn btn-default btn-xs" data-dismiss="modal" @click="loadDraft(draft._id)">载入</button>
+                    <button type="button" class="btn btn-default btn-xs" @click="deleteDraft(draft._id)">删除</button>
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+          </div>
+        </div>
+      </div>
+    </div>
     <Header></Header>
   </div>
 </template>
@@ -168,6 +207,7 @@
 import router from '../router'
 import Header from '../components/Header.vue'
 import Preview from '../components/Preview.vue'
+import Util from '../assets/js/util.js'
 
 import '../assets/js/screenfull.js'
 export default {
@@ -177,6 +217,7 @@ export default {
         // 'category': '',
         // 'tags': '',
         // 'content': '',
+        'draftLoading': false,
         'previewShow': false,
         'fontSize': 14,
         'loading': false,
@@ -186,6 +227,8 @@ export default {
         'add': false,
         'addCategoryName': '',
         'categories': [],
+        'categoriesName': {},
+        'drafts': [],
         'post': {
           'id': '',
           'title': '',
@@ -208,6 +251,9 @@ export default {
     components: {
       Preview,
       Header
+    },
+    filters: {
+      formatTime: Util.formatTime
     },
     updated() {
       if (this.confirm) {
@@ -281,6 +327,11 @@ export default {
         this.$axios.post('/getCategories', {}).then(function(response) {
           if (response.data.recode === '0000') {
             that.categories = response.data.categories;
+            for (var i = 0, len = that.categories.length; i < len; i++) {
+              var id = that.categories[i]._id;
+              var name = that.categories[i].name;
+              that.categoriesName[id] = name;
+            }
             callback && callback();
           } else {
             that.err.con = response.data.msg;
@@ -324,25 +375,115 @@ export default {
             that.success = true;
             that.suc.con = '发布成功';
           } else {
-            alert(response.data.msg);
+            that.alert = "true";
+            that.err.con = response.data.msg;
           }
         }, function(response) {
           that.alert = "true";
           that.err.con = "系统错误，请稍后重试";
         })
       },
-      save() {
+      saveDraft() {
+        var params = {
+          '_id': this.post._id || '',
+          'title': this.post.title,
+          'category': this.post.category._id,
+          'content': this.post.content,
+          'tags': this.post.tags && (this.post.tags.split(';')) || !this.post.tags && []
+        }
+        if (!params.title || !params.content) {
+          Util.hint("保存内容必须包含标题和内容", 1500, 'fail');
+          return;
+        }
+        var that = this;
+        this.$axios.post('/saveDraft', params).then(function(response) {
+          if (response.data.recode === '0000') {
+            Util.hint(response.data.msg)
+          } else {
+            Util.hint(response.data.msg);
+          }
+        }, function(response) {
+          that.alert = "true";
+          that.err.con = "系统错误，请稍后重试";
+        })
+      },
+      getDrafts() {
+        var that = this;
+        that.draftLoading = true;
+        this.$axios.post('/getDrafts').then(function(response) {
+          that.drafts = response.data.list;
+          that.draftLoading = false;
+        }, function(response) {
+          Util.hint("系统错误，请稍后重试", 1500, 'fail');
+          that.draftLoading = false;
+        })
+      },
+      loadDraft(id) {
+        var that = this;
+        that.loading = true;
+        this.$axios.post('/loadDraft', {
+          _id: id
+        }).then(function(response) {
+          var draft = response.data.draft;
+          that.post._id = draft.postid;
+          that.post.title = draft.title;
+          that.post.tags = draft.tags.join(";");
+          that.post.content = draft.content;
+          that.getCategories(function() {
+            for (var i = 0, len = that.categories.length; i < len; i++) {
+              console.log(i)
+              if (draft.category == that.categories[i]._id) {
+                that.post.category = that.categories[i];
+                break;
+              }
+            }
+          });
+          that.loading = false;
+        }, function(response) {
+          Util.hint("载入失败，请稍后重试", 1500, 'fail');
+          that.loading = false;
+        })
+      },
+      deleteDrafts() {
+        var that = this;
+        this.$axios.post('/deleteDrafts').then(function(response) {
+          if (response.data.recode === '0000') {
+            Util.hint(response.data.msg);
+            that.getDrafts();
+          } else {
+            Util.hint(response.data.msg, 3000, 'fail')
+          }
+        }, function(response) {
+          Util.hint("系统错误，请稍后重试", 1500, 'fail');
+        })
+      },
+      deleteDraft(id) {
+        var that = this;
+        this.$axios.post('/deleteDraft', {
+          _id: id
+        }).then(function(response) {
+          if (response.data.recode === '0000') {
+            Util.hint(response.data.msg)
+            that.getDrafts();
+          } else {
+            Util.hint(response.data.msg, 3000, 'fail')
+          }
+        }, function(response) {
+          Util.hint("系统错误，请稍后重试", 1500, 'fail');
+        })
+      },
+      download() {
         var params = {
           'title': this.post.title,
           'category': this.post.category.name,
           'content': this.post.content,
           'tags': this.post.tags
         }
-        this.$axios.post('/save', params).then(function(response) {
+        this.$axios.post('/download', params).then(function(response) {
           if (response.data.recode == '0000') {
             var e = document.createElement('a');
             e.href = global.serverUrl + '/' + response.data.path;
-            e.download = (params.title || 'save') + '.md';
+            e.download = (params.title || 'download') + '.md';
             e.click();
           } else {
             that.alert = "true";
@@ -412,7 +553,6 @@ export default {
             that.err.con = response.data.msg;
             that.alert = "true";
           }
-          that.loading = false;
         }).catch(function(error) {
           // console.log(error);
         })
@@ -431,7 +571,7 @@ export default {
         var param = {
           _id: this.post._id
         };
-        this.$axios.post('/post', param).then(function(response) {
+        this.$axios.post('/getPost', param).then(function(response) {
           if (response.data.recode === '0000') {
             // console.log("查询成功");
             var post = response.data.post;

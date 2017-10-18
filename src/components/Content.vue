@@ -85,13 +85,16 @@
   </div>
 </template>
 <script>
-import '../assets/js/markdown.js'
+import showdown from 'showdown';
 import Util from '../assets/js/util.js'
 import Preview from '../components/Preview.vue'
+import toc from '../assets/js/showdown-toc.js'
 
 export default {
   data() {
       return {
+        menuUpdateSign: false,
+        menuList: [],
         avatarBaseUrl: '',
         loading: false,
         post: null,
@@ -116,11 +119,23 @@ export default {
       this.avatarBaseUrl = global.avatarBaseUrl;
     },
     updated() {
-      this.post && $('#preview').html(markdown.toHTML(this.post.content));
-      this.post && (this.time = '更新于：' + Util.formatTime(this.post.updateTime));
-      $("#time").attr("data-original-title", this.time);
-      // document.getElementById('time').title=this.time;
-      $('[data-toggle="tooltip"]').tooltip();
+      var that = this;
+      this.activeCommentIframe();
+      if (that.post) {
+        var converter = new showdown.Converter();
+        converter.setOption('tables', true);
+        $('#preview').html(converter.makeHtml(this.post.content));
+        that.time = '更新于：' + Util.formatTime(that.post.updateTime)
+        $("#time").attr("data-original-title", that.time);
+        $('[data-toggle="tooltip"]').tooltip();
+        $("#menuList").html('');
+        $('#preview').find("h1,h2,h3,h4,h5,h6").each(function(i, item) {
+          var tag = $(item).get(0).localName;
+          $("#menuList").append('<a class="list-group-item list-group-item-info toc' + tag + '" onclick="document.getElementById(\'toc' + i + '\').scrollIntoView();">' + $(item).text() + '</a>')
+          $(item).attr("id", "toc" + i);
+        });
+        // $('#preview').find("h1,h2,h3,h4,h5,h6").length && $('#menuBtn').show();
+      }
     },
     watch: {
       // 如果路由有变化，会再次执行该方法
@@ -130,6 +145,16 @@ export default {
       Preview
     },
     methods: {
+      activeCommentIframe() {
+        var doms = $('.comment-iframe');
+        for (var i = 0, len = doms.length; i < len; i++) {
+          var _win = doms[i].contentWindow; // 我们用 _win 变量代替 iframe window
+          var _doc = _win.document; // 用 _doc 变量代替 iframe的document 
+          _doc.designMode = 'On';
+          _win.blur();
+          doms.blur();
+        }
+      },
       like() {
         var that = this;
         if (!this.User._id) {
@@ -181,7 +206,8 @@ export default {
             if (that.User._id && that.post.like && that.post.like.indexOf(that.User._id) >= 0) {
               that.likeinfo.hasliked = true;
             }
-            // $('#preview').html(markdown.toHTML(that.post.content));
+
+
           } else if (response.data.recode == '5005') {
             // console.log("文章不存在");
             that.error = true;
@@ -237,6 +263,7 @@ export default {
 
 #preview {
   /*font-size: 50%;*/
+  margin: 20px 0;
 }
 
 .page-header {

@@ -164,11 +164,7 @@ export default {
       $("div[comment]").each(function() {
         $(this).html($(this).attr("comment"));
       })
-      this.activeCommentIframe();
-    },
-    mounted() {
-      this.activeCommentIframe();
-
+      // this.activeCommentIframe();
     },
     created() {
       this.User = global.User;
@@ -201,14 +197,16 @@ export default {
           this.commentList.info.totalSize++;
         }
       },
-      activeCommentIframe() {
-        var doms = $('.comment-iframe');
-        for (var i = 0, len = doms.length; i < len; i++) {
-          var _win = doms[i].contentWindow; // 我们用 _win 变量代替 iframe window
-          var _doc = _win.document; // 用 _doc 变量代替 iframe的document 
-          _doc.designMode = 'On';
-        }
-      },
+      // activeCommentIframe() {
+      //   var doms = $('.comment-iframe');
+      //   for (var i = 0, len = doms.length; i < len; i++) {
+      //     var _win = doms[i].contentWindow; // 我们用 _win 变量代替 iframe window
+      //     var _doc = _win.document; // 用 _doc 变量代替 iframe的document 
+      //     _doc.designMode = 'On';
+      //     _win.blur();
+      //     doms.blur();
+      //   }
+      // },
       toggleCommentIframe(comment, user) {
         var id = comment._id;
         if (!user) {

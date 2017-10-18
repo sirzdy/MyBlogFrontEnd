@@ -100,22 +100,23 @@ router.beforeEach((to, from, next) => {
     next();
   }
   global.expression = {};
-  // global.serverUrl = 'http://192.168.43.37:3333/';
   global.serverUrl = '';
+  global.chatServerUrl = '';
+  global.serverUrl = 'https://zhangdanyang.com/';
+  global.chatServerUrl = 'https://zhangdanyang.com';
   global.expression.emoji = global.serverUrl + 'expression/emoji/';
   global.avatarBaseUrl = global.serverUrl + 'avatar/default/';
   axios.post('/check').then(function(response) {
     global.User = response.data.user || {};
     if (response.data.recode == '0000') {
       if (!global.socket) {
-        global.socket = io(global.serverUrl + 'msg');
+        global.socket = io(global.chatServerUrl+'/msg');
         var socket = global.socket;
         socket.on('connect', function() {
           socket.on('msg info', function() {
             socket.emit('msg info', global.User);
           })
         })
-
       }
     }
     if (to.meta.requireAuth && response.data.recode !== '0000') { // 判断该路由是否需要登录权限

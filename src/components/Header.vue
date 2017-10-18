@@ -129,7 +129,7 @@
             <div class="panel panel-info">
               <div class="panel-heading">
                 未读消息
-                <button @click="readMsgs" class="btn btn-default btn-xs">全部标为已读</button>
+                <button @click="readMsgs" class="btn btn-default btn-xs" v-if="msgs.length">全部标为已读</button>
               </div>
               <div class="panel-body">
                 <div class="list-group">
@@ -143,10 +143,10 @@
                 </div>
               </div>
             </div>
-            <div class="modal-footer">
-              <div class="list-group">
-                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-              </div>
+          </div>
+          <div class="modal-footer">
+            <div class="list-group">
+              <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
             </div>
           </div>
         </div>
@@ -377,7 +377,7 @@ export default {
 .header-brand {
   width: 80px;
   height: 100%;
-  background: url('../assets/favicon.png') no-repeat;
+  background: url('../assets/favicon-gray.png') no-repeat;
   background-size: 40px 40px;
   background-position: 50% 50%;
 }
