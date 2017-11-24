@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div id="menu" @click="toggleMenu" style="position:fixed;top:-5px;right:-5px;width:20px;height:20px;border-radius:10px;background:#999;z-index:10;color:#999;"></div>
+    <div id="menu" @click="toggleMenu" style="position:fixed;top:-5px;right:-5px;width:20px;height:20px;border-radius:10px;background:#999;z-index:1060;color:#999;"></div>
     <div class="panel panel-default write-panel" tabindex="-1" v-title data-title="写文章">
       <div class="panel-heading" style="padding-left:0;padding-right:0;padding-top:0px;">
         <div class="col-xs-12 col-sm-6 col-md-6" style="margin-top:10px">

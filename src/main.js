@@ -41,10 +41,10 @@ new Vue({
       global.serverUrl = 'http://localhost/';
       global.chatServerUrl = 'http://localhost';
     } else if (process.env.NODE_ENV == "production") {
-      global.serverUrl = 'http://localhost/';
-      global.chatServerUrl = 'http://localhost';
-      // global.serverUrl = 'https://zhangdanyang.com/';
-      // global.chatServerUrl = 'https://zhangdanyang.com';
+      // global.serverUrl = 'http://localhost/';
+      // global.chatServerUrl = 'http://localhost';
+      global.serverUrl = 'http://zhangdanyang.com/';
+      global.chatServerUrl = 'http://zhangdanyang.com';
     }
   }
 })
