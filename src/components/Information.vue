@@ -190,7 +190,6 @@ export default {
               avatar: that.serverUrl + response.data.path
             };
             that.postSave(params);
-
           } else {
             that.failinfo.show = true;
             that.failinfo.msg = response.data.msg;

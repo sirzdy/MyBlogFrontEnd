@@ -11,8 +11,12 @@ import './assets/css/style.css'
 import './assets/css/animate.css'
 import './assets/js/bootstrap.min.js'
 
+//开发环境请求转发
+if (process.env.NODE_ENV == "development") {
+  axios.defaults.baseURL = '/api';
+} else if (process.env.NODE_ENV == "production") {
 
-// axios.defaults.baseURL = '/api';
+}
 Vue.prototype.$axios = axios;
 Vue.config.productionTip = false;
 /* eslint-disable no-new */
@@ -26,5 +30,21 @@ new Vue({
   el: '#app',
   router,
   template: '<App/>',
-  components: { App }
+  components: { App },
+  created() {
+    global.expression = {};
+    global.expression.emoji = '../static/resource/expression/emoji/';
+    global.avatarBaseUrl = '../static/resource/avatar/default/';
+    global.resourceBaseUrl = '../static/resource/';
+    //生产环境与开发环境url配置
+    if (process.env.NODE_ENV == "development") {
+      global.serverUrl = 'http://localhost/';
+      global.chatServerUrl = 'http://localhost';
+    } else if (process.env.NODE_ENV == "production") {
+      global.serverUrl = 'http://localhost/';
+      global.chatServerUrl = 'http://localhost';
+      // global.serverUrl = 'https://zhangdanyang.com/';
+      // global.chatServerUrl = 'https://zhangdanyang.com';
+    }
+  }
 })

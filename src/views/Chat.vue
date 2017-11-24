@@ -25,32 +25,32 @@
           </div>
           <div class="flex-column-emp flex-column" style="width:100%;">
             <div class="flex-column-emp" style="width:100%;overflow:scroll;flex-wrap: nowrap;" v-show="curTab==1">
-              <div style="height:25px;text-align:center;line-height:25px;">
-                当前共{{chatList.length}}人在线
-                <i class="fa fa-refresh btn-refresh" id="btnChatRefresh" @click="getChatList()"></i>
-              </div>
               <div v-for="chat in chatList" v-if="chat" class="chatList flex-row flex-center" @click="chatWithPerson(chat);setPanel(false);notReadMesCount[chat._id]=null;">
                 <span>{{chat.nickname}}</span>
                 <span class="flex-row-emp"></span>
                 <span class="badge">{{notReadMesCount[chat._id]}}</span>
               </div>
+              <div style="height:25px;text-align:center;line-height:25px;color:#999">
+                当前共{{chatList.length}}人在线
+                <i class="fa fa-refresh btn-refresh" id="btnChatRefresh" @click="getChatList()"></i>
+              </div>
             </div>
-            <div class="flex-column-emp" style="width:100%;overflow:scroll;flex-wrap: nowrap;" v-show="curTab==2">
-              <div style="height:25px;text-align:center;line-height:25px;">
-                当前共{{roomList.length}}个聊天室
-                <i class="fa fa-refresh btn-refresh" id="btnRoomRefresh" @click="getRoomList()"></i>
-              </div>
-              <!-- 当前共{{roomList.length}}聊天室 -->
-              <div class="input-group">
-                <input type="text" class="form-control" placeholder="请输入房间名字" v-model="addRoomName">
-                <span class="input-group-addon" v-on:click="addRoom">新增聊天室</span>
-              </div>
+            <div class="flex-column-emp flex-column" style="width:100%;overflow:scroll;flex-wrap: nowrap;" v-show="curTab==2">
               <div v-for="room in roomList" v-if="room" class="chatList flex-row flex-center" @click="enterRoom(room);setPanel(false);notReadMesCount[room.name]=null;">
                 <span>{{room.name}}</span>
                 <span class="flex-row-emp"></span>
                 <span class="badge">{{notReadMesCount[room.name]}}</span>
                 <span v-show="inRoom[room.name]" @click.stop="leaveRoom(room.name)"><i class="fa fa-sign-out fa-fw"></i></span>
                 <span v-show="room.creator==socketInfo._id" @click.stop="removeRoom(room.name)"><i class="fa fa-close fa-fw"></i></span>
+              </div>
+              <div style="height:25px;text-align:center;line-height:25px;color:#999">
+                当前共{{roomList.length}}个聊天室
+                <i class="fa fa-refresh btn-refresh" id="btnRoomRefresh" @click="getRoomList()"></i>
+              </div>
+              <div class="flex-column-emp"></div>
+              <div class="input-group">
+                <input type="text" class="form-control" placeholder="请输入房间名字" v-model="addRoomName">
+                <span class="input-group-addon" v-on:click="addRoom">新增聊天室</span>
               </div>
             </div>
             <div class="flex-column-emp" style="width:100%;overflow:scroll;flex-wrap: nowrap;" v-show="curTab==3">

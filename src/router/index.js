@@ -99,18 +99,12 @@ router.beforeEach((to, from, next) => {
   if (to.name == 'Transition') {
     next();
   }
-  global.expression = {};
-  global.serverUrl = '';
-  global.chatServerUrl = '';
-  global.serverUrl = 'https://zhangdanyang.com/';
-  global.chatServerUrl = 'https://zhangdanyang.com';
-  global.expression.emoji = global.serverUrl + 'expression/emoji/';
-  global.avatarBaseUrl = global.serverUrl + 'avatar/default/';
+
   axios.post('/check').then(function(response) {
     global.User = response.data.user || {};
     if (response.data.recode == '0000') {
       if (!global.socket) {
-        global.socket = io(global.chatServerUrl+'/msg');
+        global.socket = io(global.chatServerUrl + '/msg');
         var socket = global.socket;
         socket.on('connect', function() {
           socket.on('msg info', function() {
@@ -121,13 +115,11 @@ router.beforeEach((to, from, next) => {
     }
     if (to.meta.requireAuth && response.data.recode !== '0000') { // 判断该路由是否需要登录权限
       router.push('Signin');
+      global.backRouter = { 'name': to.name, 'params': to.params };
     } else {
       next();
     }
   });
-  if (to && to.name == 'Signin' && from && from.name != 'Signup' && from.name != 'Signin' && from.name != 'ChangePassword') {
-    global.backRouter = { 'name': from.name, 'params': from.params };
-  }
   global.module = to.name;
 });
 

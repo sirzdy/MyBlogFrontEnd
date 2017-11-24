@@ -2,7 +2,7 @@
   <div v-title data-title="注册">
     <Background></Background>
     <div class="signbox container">
-      <img src="../assets/favicon.png" class="logo" alt="">
+      <img src="../assets/logo.png" class="logo" alt="">
       <div class="col-xs-12 form-group input-group-lg">
         <input type="text" class="form-control margintop20" placeholder="请输入昵称" v-on:focus="initmsg" v-model="nickname">
         <input type="email" class="form-control margintop20" placeholder="请输入邮箱" v-on:focus="initmsg" v-model="email">
@@ -31,6 +31,7 @@
 <script>
 import Background from '../components/Background.vue';
 import router from '../router'
+import encrypt from '../assets/js/encrypt.js';
 export default {
   name: 'hello',
   data() {
@@ -158,7 +159,7 @@ export default {
       var params = {
         'email': this.email,
         'nickname': this.nickname,
-        'password': this.password,
+        'password': encrypt(this.password),
         'vercode': this.vercode
       };
       var that = this;

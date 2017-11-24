@@ -2,7 +2,7 @@
   <div v-title data-title="登录">
     <Background></Background>
     <div class="signbox container">
-      <img src="../assets/favicon.png" class="logo" alt="">
+      <img src="../assets/logo.png" class="logo" alt="">
       <div class="col-xs-12 form-group input-group-lg">
         <input type="text" class="form-control margintop20 " v-on:focus="initmsg" placeholder="请输入邮箱" v-model="email">
         <input type="password" class="form-control margintop20 " v-on:focus="initmsg" placeholder="请输入密码" v-model="password">
@@ -13,9 +13,9 @@
         </div>
         <div class="alert alert-danger margintop20" role="alert" v-show="err.show"><b>{{err.con}}</b></div>
         <div class="margintop20">
-          <i class="fa fa-qq fa-lg pull-left font-black link"></i>
+          <!-- <i class="fa fa-qq fa-lg pull-left font-black link"></i>
           <i class="fa fa-weibo fa-lg pull-left font-black link"></i>
-          <i class="fa fa-weixin fa-lg pull-left font-black link"></i>
+          <i class="fa fa-weixin fa-lg pull-left font-black link"></i> -->
           <router-link :to="{ name: 'ChangePassword'}" class="font-black pull-right link">忘记密码</router-link>
           <router-link :to="{ name: 'Signup'}" class="font-black pull-right link">注册</router-link>
         </div>
@@ -25,6 +25,7 @@
 </template>
 <script>
 import Background from '../components/Background.vue';
+import encrypt from '../assets/js/encrypt.js';
 import router from '../router'
 
 export default {
@@ -42,8 +43,8 @@ export default {
           'con': '',
           'show': false
         },
-        'email': 'boxuerixin@qq.com',
-        'password': '123456',
+        'email': '',
+        'password': '',
         'backRouter': {
           'name': 'Index'
         }
@@ -89,9 +90,12 @@ export default {
           }
         }
         var that = this;
+        // var crypt = new JSEncrypt();
+        // crypt.setKey(key.rsaPublicKey); //公钥
+        // var password = crypt.encrypt(this.password);
         var params = {
           'email': this.email,
-          'password': this.password
+          'password': encrypt(this.password)
         }
         this.$axios.post('/signin', params).then(function(response) {
           // console.log(response)

@@ -8,10 +8,10 @@
         <div class="alert alert-info">文章不存在</div>
       </div>
       <div v-if="post" class="content">
-        <div class="page-header">
+        <div class="page-header" id="postTitle">
           <h1>
           <small>
-            <span class="label label-info" data-toggle="tooltip" data-placement="top" title="分类"><i class="fa fa-bookmark"></i> {{ post.category.name }}</span>
+            <span class="label label-info" style="background:#2f68b3" data-toggle="tooltip" data-placement="top" title="分类"><i class="fa fa-bookmark"></i> {{ post.category.name }}</span>
           </small>
           <span data-toggle="tooltip" data-placement="top" v-title v-bind:data-title="post.title" title="标题">{{ post.title }} </span>  
           <button class="btn btn-xs btn-default" v-show="post.author&&post.author._id==User._id" v-on:click="goEdit">编辑</button>
@@ -61,15 +61,29 @@
       </div>
       <!-- 点赞 -->
       <div v-if="post" class="text-center clearfix">
-        <div class="like-area" v-on:click="like">
-          <div style="margin-top:15px">
-            <i class="fa fa-heart-o fa-3x" v-if="!likeinfo.hasliked"></i>
-            <i class="fa fa-heart fa-3x" v-else></i>
+        <div class="flex-row">
+          <div class="flex-row-emp"></div>
+          <div class="like-area" v-on:click="like">
+            <div style="margin-top:15px">
+              <i class="fa fa-heart-o fa-3x" v-if="!likeinfo.hasliked"></i>
+              <i class="fa fa-heart fa-3x" v-else></i>
+            </div>
+            <div style="margin-top:5px;font-size:18px">
+              {{post&&post.like&&post.like.length||0}}
+            </div>
           </div>
-          <div style="margin-top:5px;font-size:18px">
-            {{post&&post.like&&post.like.length||0}}
+          <div style="width:20px;"></div>
+          <div class="like-area" v-on:click="reward=!reward">
+            <div style="margin-top:15px">
+              <i class="fa fa-rmb fa-3x"></i>
+            </div>
+            <div style="margin-top:5px;font-size:18px">
+              打赏
+            </div>
           </div>
+          <div class="flex-row-emp"></div>
         </div>
+        <img src="../assets/images/reward-sm.png" alt="" v-show="reward" style="width:300px;">
         <div class="alert alert-danger  alert-dismissible text-center" v-show="likeinfo.error">
           <button type="button" class="close" v-on:click="likeinfo.error=false"><span aria-hidden="true">&times;</span></button>
           <div v-show="likeinfo.errsign">
@@ -101,6 +115,7 @@ export default {
         error: null,
         User: {},
         time: null,
+        reward: false,
         likeinfo: {
           hasliked: false,
           error: false,
@@ -128,7 +143,7 @@ export default {
         that.time = '更新于：' + Util.formatTime(that.post.updateTime)
         $("#time").attr("data-original-title", that.time);
         $('[data-toggle="tooltip"]').tooltip();
-        $("#menuList").html('');
+        $("#menuList").html('<a class="list-group-item list-group-item-info" onclick="document.getElementById(\'postTitle\').scrollIntoView();"><b>标题</b></a>');
         $('#preview').find("h1,h2,h3,h4,h5,h6").each(function(i, item) {
           var tag = $(item).get(0).localName;
           $("#menuList").append('<a class="list-group-item list-group-item-info toc' + tag + '" onclick="document.getElementById(\'toc' + i + '\').scrollIntoView();">' + $(item).text() + '</a>')

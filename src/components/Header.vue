@@ -1,22 +1,22 @@
 <template>
-  <div class="header">
+  <div class="header" onselect="return false;" onselectstart="return false;">
     <!-- 大屏 横向 header start -->
-    <div class="header-hor">
+    <div class="header-hor" v-bind:class="{'header-index':module=='Index'}">
       <router-link style="width:80px;height:50px" :to="{ name: 'Index'}">
         <div class="header-brand"></div>
       </router-link>
-      <router-link class="header-link" v-bind:class="{'header-link-active':module=='Index'}" :to="{ name: 'Index'}">主页</router-link>
-      <router-link class="header-link" v-bind:class="{'header-link-active':module=='Posts'}" :to="{ name: 'Posts'}">文集</router-link>
-      <router-link class="header-link" v-bind:class="{'header-link-active':module=='Works'}" :to="{ name: 'Works'}">作品</router-link>
-      <router-link class="header-link" v-bind:class="{'header-link-active':module=='Chat'}" :to="{ name: 'Chat'}">聊天</router-link>
+      <router-link class="header-link" v-bind:class="{'header-link-active':module=='Index','header-link-index':module=='Index'}" :to="{ name: 'Index'}">主页</router-link>
+      <router-link class="header-link" v-bind:class="{'header-link-active':module=='Posts'||module=='Post','header-link-index':module=='Index'}" :to="{ name: 'Posts'}">文集</router-link>
+      <router-link class="header-link" v-bind:class="{'header-link-active':module=='Works','header-link-index':module=='Index'}" :to="{ name: 'Works'}">作品</router-link>
+      <router-link class="header-link" v-bind:class="{'header-link-active':module=='Chat','header-link-index':module=='Index'}" :to="{ name: 'Chat'}">聊天</router-link>
       <div class="header-emp"></div>
       <div class="header-hor-search-area" v-show="module!='Search'">
         <input type="text" class="form-control search-input pull-right" v-model="keyword" placeholder="搜索" v-on:keyup.esc="keyword=''" v-on:keyup.enter="goSearch">
         <i class="fa fa-search fa-lg search-btn" v-on:click="goSearch"></i>
       </div>
-      <router-link class="header-link header-link-btn" :to="{ name: 'Signin'}" v-if="!User._id">登录</router-link>
+      <router-link class="header-link header-link-btn" v-bind:class="{'header-link-index':module=='Index'}" :to="{ name: 'Signin'}" v-if="!User._id">登录</router-link>
       <div v-if="User._id" tabindex="-1" style="outline:none;padding:5px;" id="header-hor-dropdown-menu-div" v-on:click="toggleMenu()" v-on:blur="toggleMenu(false)">
-        <img v-bind:src="User.avatar||avatarBaseUrl+'default.png'" class="img-rounded" style="width:30px;height:30px;cursor:pointer;">
+        <img v-bind:src="User.avatar||avatarBaseUrl+'default.png'" class="img-rounded" style="width:25px;height:25px;cursor:pointer;">
         <ul id="header-hor-dropdown-menu" class="header-hor-dropdown-menu">
           <li v-on:click="goWrite">
             <i class="fa fa-pencil fa-fw "></i> 写文章
@@ -35,25 +35,24 @@
           </li>
         </ul>
       </div>
-      <span class="badge" style="position:absolute;top:8px;right:16px;padding:2px" v-if="msgs&&msgs.length" data-toggle="modal" data-target="#msgs">{{msgs.length}}</span>
+      <span class="badge" style="position:absolute;top:8px;right:16px;padding:2px;background:#FF0000;" v-if="msgs&&msgs.length" data-toggle="modal" data-target="#msgs">{{msgs.length}}</span>
       <!-- <a class="header-link header-link-btn" :to="{}" v-on:click="signout" v-if="User._id" style="cursor:pointer">登出</a> -->
     </div>
     <!-- 大屏 header end -->
     <!-- 小屏 纵向 header start -->
     <div class="header-ver">
-      <div class="header-ver-bar">
-        <i class="fa fa-bars fa-lg fa-fw" @click="menuShow=!menuShow"></i>
+      <div class="header-ver-bar" v-bind:class="{'header-index':module=='Index'}">
+        <i class="fa fa-bars fa-lg fa-fw" style="color:#fff" @click="menuShow=!menuShow"></i>
         <div class="header-emp"></div>
         <router-link style="width:80px;height:50px" :to="{ name: 'Index'}">
           <div class="header-brand"></div>
         </router-link>
         <div class="header-emp"></div>
         <router-link :to="{ name: 'Signin'}" v-if="!User._id">
-          <i class="fa fa-user fa-lg fa-fw" style="color:#666;"></i>
+          <i class="fa fa-user fa-lg fa-fw" style="color:#fff;"></i>
         </router-link>
-        <img @click="myMenuShow=!myMenuShow" v-if="User._id" v-bind:src="User.avatar||avatarBaseUrl+'default.png'" class="img-rounded" style="width:28px;height:28px;cursor:pointer;">
-        <!-- <i class="fa fa-user fa-lg fa-fw"></i> -->
-        <span class="badge" style="position:absolute;top:8px;right:8px;padding:2px" v-if="msgs&&msgs.length">{{msgs.length}}</span>
+        <img @click="myMenuShow=!myMenuShow" v-if="User._id"  v-bind:src="User.avatar||avatarBaseUrl+'default.png'" class="img-rounded" style="width:22px;height:22px;cursor:pointer;">
+        <span class="badge" style="position:absolute;top:8px;right:8px;padding:2px;background:#FF0000;" v-if="msgs&&msgs.length" data-target="#msgs">{{msgs.length}}</span>
       </div>
       <div class="header-ver-content" ontouchmove="return false;" v-show="menuShow">
         <div class="header-ver-brand"></div>
@@ -355,13 +354,15 @@ export default {
 
 .header {
   position: relative;
+  z-index: 1050;
 }
 
 .header-hor {
   height: 50px;
   width: 100%;
-  background: #f8f8f8;
-  border-bottom: 1px solid #eee;
+  background:#1f5498;/*#18447d;*/
+  /*background: linear-gradient(0deg, #1e88e5  1%, #0b4182 100%);*/
+  border-bottom: 1px solid #0b4182;
   display: flex;
   display: -webkit-flex;
   flex-direction: row;
@@ -377,7 +378,7 @@ export default {
 .header-brand {
   width: 80px;
   height: 100%;
-  background: url('../assets/favicon-gray.png') no-repeat;
+  background: url('../assets/logo-white.png') no-repeat;
   background-size: 40px 40px;
   background-position: 50% 50%;
 }
@@ -387,31 +388,39 @@ export default {
   height: 50px;
   line-height: 50px;
   font-size: 18px;
-  color: #666666;
+  color: #e7e7e7;
   text-align: center;
+  font-weight: bold;
   /*background: #648ee1;*/
   text-decoration: none !important;
 }
 
 .header-link:hover {
-  color: #000;
-  background: #eee;
+  color: #ffffff;
+  background: #013b82;
 }
 
 .header-link-active {
-  color: #666;
-  background: #eee;
-  border-right: 1px solid #e8e8e8;
-  border-left: 1px solid #e8e8e8;
+  color: #ffffff;
+  background: #013b82;
+  border-right: 1px solid #0b4182;
+  border-left: 1px solid #0b4182;
 }
-
+.header-link-index {
+   background: none;
+   border-left: none;
+   border-right: none;
+}
+.header-link-index:hover {
+   background: none;
+}
 .header-link-btn {
   height: 34px;
   width: 45px;
   min-width: 45px;
   line-height: 34px;
   font-size: 14px;
-  border: 1px solid #ccc;
+  /*border: 1px solid #0b4182;*/
   border-radius: 3px;
   margin-left: 10px;
 }
@@ -441,9 +450,9 @@ export default {
   max-width: 300px;
 }
 
-.search-input:focus+.search-btn {
+.search-input:hover+.search-btn,.search-input:focus+.search-btn {
   /*color: #76aee4;*/
-  color: #538bb1;
+  color: #0b4182;
 }
 
 .header-hor-search-area {
@@ -506,7 +515,7 @@ export default {
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  background: #f8f8f8;
+  background: #1f5498;
   padding: 0 10px;
   color: #666;
 }
@@ -528,7 +537,7 @@ export default {
 .header-ver-brand {
   width: 80px;
   height: 160px;
-  background: url('../assets/favicon.png') no-repeat;
+  background: url('../assets/logo.png') no-repeat;
   background-size: 80px 80px;
   background-position: 50% 50%;
 }
@@ -577,7 +586,10 @@ export default {
   position: relative;
 }
 
-
+.header-index{
+  background: none;
+  border-bottom: none;
+}
 /* 小屏幕导航条 end */
 
 

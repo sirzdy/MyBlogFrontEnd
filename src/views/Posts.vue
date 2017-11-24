@@ -1,11 +1,11 @@
 <template>
   <div v-title data-title="文集">
     <Header></Header>
-    <Top></Top>
+    <Bar></Bar>
     <div style="height:20px;"></div>
     <div style="max-width:1000px;margin:0 auto;">
       <div class="col-md-3 col-sm-4">
-        <div class="panel panel-info">
+        <div class="panel panel-primary">
           <div class="panel-heading">
             分类
           </div>
@@ -18,28 +18,28 @@
             </div>
           </div>
         </div>
-        <div class="panel panel-info">
+        <div class="panel panel-primary">
           <div class="panel-heading">
             排序方式
           </div>
           <div class="panel-body">
             <div class="text-center">
               <label>
-                <input type="radio" name="order" v-model="order" value="heat"> 按文章热度
+                <input type="radio" name="order" v-model="order" value="heat" v-on:click="mode=true;search()"> 按文章热度
               </label>
               <label>
-                <input type="radio" name="order" v-model="order" value="time"> 按发布时间
+                <input type="radio" name="order" v-model="order" value="time" v-on:click="mode=true;search()"> 按发布时间
               </label>
             </div>
           </div>
         </div>
-        <div class="panel panel-info">
+        <div class="panel panel-primary">
           <div class="panel-heading">
             搜索
           </div>
           <div class="panel-body">
             <div class="text-center">
-              <input type="text" class="form-control" placeholder="请输入搜索关键词" v-model="keyword">
+              <input type="text" class="form-control" placeholder="请输入搜索关键词" v-model="keyword" v-on:keyup.esc="keyword=''" v-on:keyup.enter="mode=false;query.category=null;search()">
               <button type="button" class="btn btn-default btn-block" style="margin-top:10px" v-on:click="mode=false;query.category=null;search()">站内搜索</button>
             </div>
           </div>
@@ -51,11 +51,11 @@
           <i class="fa fa-spinner fa-spin fa-2x"></i>
         </div>
         <div v-show="loaded&&!loading&&result.list.length==0" class="col-xs-12">
-          <div class="alert alert-info">未找到相关记录</div>
+          <div class="alert alert-result">未找到相关记录</div>
         </div>
         <div v-show="!loading&&result.list.length>0">
           <div class="col-xs-12">
-            <div class="alert alert-info">共找到<strong>【{{result.totalSize}}】</strong>条记录，当前显示第【{{result.start}}】-【{{result.end}}】</strong>条记录</div>
+            <div class="alert alert-result">共找到<strong>【{{result.totalSize}}】</strong>条记录，当前显示第【{{result.start}}】-【{{result.end}}】</strong>条记录</div>
           </div>
           <div v-for="post in result.list">
             <Brief v-bind:post="post"></Brief>
@@ -63,23 +63,19 @@
           <nav aria-label="Page navigation" class="text-center" v-if="listinfo.pages>1">
             <ul class="pagination">
               <li v-bind:class="{'disabled':listinfo.page==1}" v-on:click="listinfo.page!=1&&search(1)">
-                <a><i class="fa fa-step-backward"></i></a>
+                <a><i class="fa fa-angle-double-left"></i></a>
               </li>
               <li v-bind:class="{'disabled':listinfo.page==1}" v-on:click="listinfo.page!=1&&search(listinfo.page-1)">
-                <a aria-label="Previous">
-                  <span aria-hidden="true">&laquo;</span>
-                </a>
+                <a><i class="fa fa-angle-left"></i></a>
               </li>
               <li v-for="n in listinfo.pagearr" v-bind:class="{'active':n==listinfo.page,'disabled':n=='...'}" v-on:click="n!='...'&&n!=listinfo.page&&search(n)">
                 <a>{{n}}</a>
               </li>
               <li v-bind:class="{'disabled':listinfo.page==listinfo.pages}" v-on:click="listinfo.page!=listinfo.pages&&search(listinfo.page+1)">
-                <a aria-label="Next">
-                  <span aria-hidden="true">&raquo;</span>
-                </a>
+                <a><i class="fa fa-angle-right"></i></a>
               </li>
               <li v-bind:class="{'disabled':listinfo.page==listinfo.pages}" v-on:click="listinfo.page!=listinfo.pages&&search(listinfo.pages)">
-                <a><i class="fa fa-step-forward"></i></a>
+                <a><i class="fa fa-angle-double-right"></i></a>
               </li>
             </ul>
           </nav>
@@ -91,7 +87,7 @@
 </template>
 <script>
 import Header from '../components/Header.vue';
-import Top from '../components/Top.vue';
+import Bar from '../components/Bar.vue';
 import Brief from '../components/Brief.vue';
 import Util from '../assets/js/util.js'
 export default {
@@ -124,7 +120,7 @@ export default {
     },
     components: {
       Header,
-      Top,
+      Bar,
       Brief
     },
     created() {
@@ -221,11 +217,19 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .list-group-item-active {
-  background: #ddedf6;
-  color:#555;
+  background: #337ab7;
+  color: #fff;
 }
-.list-group-item:hover{
-  background: #ddedf6;
-  color:#555;
+
+.list-group-item:hover {
+  background: #337ab7;
+  color: #fff;
+}
+
+.alert-result {
+  background: #337ab7;
+  color: #f8f8f8;
+  font-weight: bold;
+  text-align: center;
 }
 </style>

@@ -240,7 +240,6 @@ var Util = {
       duration: 500,
       easing: "swing"
     });
-    console.log($(global.anchor).text());
     $(global.anchor).css({ 'font-weight': 'bold' });
     delete global.anchor;
   }

@@ -2,7 +2,7 @@
   <div v-title data-title="修改密码">
     <Background></Background>
     <div class="signbox container">
-      <img src="../assets/favicon.png" class="logo" alt="">
+      <img src="../assets/logo.png" class="logo" alt="">
       <div class="col-xs-12 form-group input-group-lg">
         <input type="email" class="form-control margintop20" placeholder="请输入邮箱" v-on:focus="initmsg" v-model="email">
         <div style="position:relative;" class="input-group-lg">
@@ -29,6 +29,7 @@
 </template>
 <script>
 import Background from '../components/Background.vue';
+import encrypt from '../assets/js/encrypt.js';
 import router from '../router'
 export default {
   name: 'hello',
@@ -83,7 +84,7 @@ export default {
       this.verify.loading = true;
       this.verify.disabled = true;
       this.$axios.post('/verifyEmail', param).then(function(response) {
-      	// console.log(response);
+        // console.log(response);
         if (response.data.recode === '0000') {
           that.verify.loading = false;
           that.verify.disabled = false;
@@ -142,7 +143,7 @@ export default {
       }
       var params = {
         'email': this.email,
-        'password': this.password,
+        'password': encrypt(this.password),
         'vercode': this.vercode
       };
       var that = this;

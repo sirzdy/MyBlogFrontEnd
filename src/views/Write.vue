@@ -26,14 +26,15 @@
         </div>
       </div>
       <div class="post-area">
-        <textarea class="form-control  write-area" id="content" v-bind:style="{fontSize:fontSize+'px'}" v-model="post.content" @keyup.ctrl.enter="keyup"></textarea>
+        <textarea class="form-control  write-area" id="content" v-bind:style="{fontSize:fontSize+'px'}" v-model="post.content" @keyup.ctrl.enter="keyup" placeholder="建议本地书写完成，复制粘贴到此处发布..."></textarea>
         <div class="preview-area" readonly="" v-show="previewShow">
           <Preview v-bind:content="post.content"></Preview>
         </div>
       </div>
+      <iframe id="upload" style="height:300px;width:100%;" frameborder="0" v-show="uploadShow"></iframe>
       <div class="panel-footer" style="padding:10px 0 0 0;">
         <div class="alert alert-danger margintop20" role="alert" v-show="err.show"><b>{{err.con}}</b></div>
-        <div class="col-sm-4 col-xs-12 text-center" style="margin-bottom:10px;padding:0;">
+        <div class="col-sm-3 col-xs-12 text-center" style="margin-bottom:10px;padding:0;">
           <!-- <div class="btn-toolbar "> -->
           <div class="btn-group btn-group-sm">
             <button class="btn btn-default" v-on:click="fullscreenToggleWrite"><i class="fa fa-arrows-alt"></i> 专注</button>
@@ -42,7 +43,7 @@
           </div>
         </div>
         <!-- </div> -->
-        <div class="col-sm-4 col-xs-12 text-center" style="margin-bottom:10px;padding:0;">
+        <div class="col-sm-3 col-xs-12 text-center" style="margin-bottom:10px;padding:0;">
           <!-- <div class="btn-toolbar"> -->
           <div class="btn-group btn-group-sm">
             <button class="btn btn-default" v-on:click="upload"><i class="fa fa-photo"></i> 传图</button>
@@ -51,14 +52,20 @@
           </div>
           <!-- </div> -->
         </div>
-        <div class="col-sm-4 col-xs-12 text-center" style="margin-bottom:10px;padding:0;">
+        <div class="col-sm-3 col-xs-12 text-center" style="margin-bottom:10px;padding:0;">
+          <!-- <div class="btn-toolbar"> -->
+          <div class="btn-group btn-group-sm">
+            <button class="btn btn-default" v-on:click="getDrafts" data-toggle="modal" data-target="#drafts"><i class="fa fa-inbox"></i> 草稿箱</button>
+            <button class="btn btn-default" v-on:click="saveDraft"><i class="fa fa-save"></i> 存草稿</button>
+          </div>
+          <!-- </div> -->
+        </div>
+        <div class="col-sm-3 col-xs-12 text-center" style="margin-bottom:10px;padding:0;">
           <!-- <div class="btn-toolbar"> -->
           <div class="btn-group btn-group-sm">
             <button class="btn btn-default" v-on:click="confirm = 'del'" v-if="post._id"><i class="fa fa-trash-o"></i> 删除</button>
             <button class="btn btn-default" v-on:click="confirm = 'clear'" v-else="!post._id"><i class="fa fa-trash-o"></i> 清空</button>
             <button class="btn btn-default" v-on:click="download"><i class="fa fa-download"></i> 下载</button>
-            <button class="btn btn-default" v-on:click="getDrafts" data-toggle="modal" data-target="#drafts"><i class="fa fa-save"></i> 草稿</button>
-            <button class="btn btn-default" v-on:click="saveDraft"><i class="fa fa-save"></i> 保存</button>
             <button class="btn btn-default" v-on:click="publish" v-if="!post._id"><i class="fa fa-send-o"></i> 发布</button>
             <button class="btn btn-default" v-on:click="update" v-else="post._id"><i class="fa fa-send-o"></i> 更新</button>
           </div>
@@ -228,6 +235,7 @@ export default {
         'addCategoryName': '',
         'categories': [],
         'categoriesName': {},
+        'uploadShow': false,
         'drafts': [],
         'post': {
           'id': '',
@@ -479,6 +487,7 @@ export default {
           'content': this.post.content,
           'tags': this.post.tags
         }
+        var that = this;
         this.$axios.post('/download', params).then(function(response) {
           if (response.data.recode == '0000') {
             var e = document.createElement('a');
@@ -611,7 +620,10 @@ export default {
         }
       },
       upload() {
-        console.log("待完善");
+        this.uploadShow = !this.uploadShow;
+        if (!$('#upload').attr("src")) {
+          $('#upload').attr("src", "http://localhost:1225");
+        }
       }
     }
 }

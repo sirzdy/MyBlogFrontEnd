@@ -5,7 +5,7 @@
       <Content></Content>
       <Comment></Comment>
     </div>
-    <Top></Top>
+    <Bar></Bar>
   </div>
 </template>
 <script>
@@ -13,7 +13,7 @@ import Util from '../assets/js/util.js'
 import Header from '../components/Header.vue'
 import Content from '../components/Content.vue'
 import Comment from '../components/Comment.vue'
-import Top from '../components/Top.vue'
+import Bar from '../components/Bar.vue'
 
 export default {
   data() {
@@ -23,7 +23,7 @@ export default {
       Header,
       Content,
       Comment,
-      Top
+      Bar
     }
 }
 </script>

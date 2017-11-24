@@ -1,13 +1,13 @@
 <template>
   <div class="col-xs-12">
-    <div class="panel panel-info">
+    <div class="panel panel-primary">
       <div class="panel-heading brief-header">
         <span style="width:100%;margin-right:10px">
         <router-link :to="{ name: 'Posts', params: { category: post.category }}">
-          <span class="label label-info"><i class="fa fa-bookmark"></i> {{post.category.name}}</span>
+          <span class="label label-primary" style="background:#2f68b3"><i class="fa fa-bookmark"></i> {{post.category.name}}</span>
         </router-link>
         <router-link :to="{ name: 'Post', params: { id: post._id }}">
-          <span style="line-height:25px;">{{post.title}}</span>
+          <span style="line-height:25px;color:#ffffff;font-weight:bold;">{{post.title}}</span>
         </router-link>
         <i style="line-height:25px;" class="fa fa-calendar brief-footer-inf pull-right publishTimeDate" > {{post.publishTime|formatTime('date')}} </i>
         <i style="line-height:25px;" class="fa fa-calendar brief-footer-inf pull-right publishTime" > {{post.publishTime|formatTime}} </i>
