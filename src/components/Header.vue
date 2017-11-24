@@ -30,6 +30,9 @@
           <li v-on:click="goChangePassword">
             <i class="fa fa-key fa-fw"></i> 修改密码
           </li>
+          <li v-on:click="downloadMyPosts">
+            <i class="fa fa-download fa-fw"></i> 打包下载
+          </li>
           <li v-on:click="signout">
             <i class="fa fa-sign-out fa-fw"></i> 退出
           </li>
@@ -51,7 +54,7 @@
         <router-link :to="{ name: 'Signin'}" v-if="!User._id">
           <i class="fa fa-user fa-lg fa-fw" style="color:#fff;"></i>
         </router-link>
-        <img @click="myMenuShow=!myMenuShow" v-if="User._id"  v-bind:src="User.avatar||avatarBaseUrl+'default.png'" class="img-rounded" style="width:22px;height:22px;cursor:pointer;">
+        <img @click="myMenuShow=!myMenuShow" v-if="User._id" v-bind:src="User.avatar||avatarBaseUrl+'default.png'" class="img-rounded" style="width:22px;height:22px;cursor:pointer;">
         <span class="badge" style="position:absolute;top:8px;right:8px;padding:2px;background:#FF0000;" v-if="msgs&&msgs.length" data-target="#msgs">{{msgs.length}}</span>
       </div>
       <div class="header-ver-content" ontouchmove="return false;" v-show="menuShow">
@@ -331,7 +334,23 @@ export default {
             });
           }
         }
-
+      },
+      downloadMyPosts() {
+        this.$axios.post('/downloadMyPosts').then(function(response) {
+          if (response.data.recode == '0000') {
+            var e = document.createElement('a');
+            e.href = global.serverUrl + '/' + response.data.path;
+            e.download = ('download') + '.zip';
+            e.click();
+            // Util.hint('downloading...', 1000);
+          } else if (response.data.recode == '5005') {
+            Util.hint(response.data.msg, 1000);
+          } else {
+            Util.hint('系统错误，请稍后重试', 1000);
+          }
+        }).catch(function(error) {
+          Util.hint('系统错误，请稍后重试', 1000);
+        })
       },
       signout: function() {
         this.$axios.post('/signout').then(function(response) {
@@ -360,7 +379,8 @@ export default {
 .header-hor {
   height: 50px;
   width: 100%;
-  background:#1f5498;/*#18447d;*/
+  background: #1f5498;
+  /*#18447d;*/
   /*background: linear-gradient(0deg, #1e88e5  1%, #0b4182 100%);*/
   border-bottom: 1px solid #0b4182;
   display: flex;
@@ -406,14 +426,17 @@ export default {
   border-right: 1px solid #0b4182;
   border-left: 1px solid #0b4182;
 }
+
 .header-link-index {
-   background: none;
-   border-left: none;
-   border-right: none;
+  background: none;
+  border-left: none;
+  border-right: none;
 }
+
 .header-link-index:hover {
-   background: none;
+  background: none;
 }
+
 .header-link-btn {
   height: 34px;
   width: 45px;
@@ -450,7 +473,8 @@ export default {
   max-width: 300px;
 }
 
-.search-input:hover+.search-btn,.search-input:focus+.search-btn {
+.search-input:hover+.search-btn,
+.search-input:focus+.search-btn {
   /*color: #76aee4;*/
   color: #0b4182;
 }
@@ -586,10 +610,12 @@ export default {
   position: relative;
 }
 
-.header-index{
+.header-index {
   background: none;
   border-bottom: none;
 }
+
+
 /* 小屏幕导航条 end */
 
 

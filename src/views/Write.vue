@@ -491,7 +491,7 @@ export default {
         this.$axios.post('/download', params).then(function(response) {
           if (response.data.recode == '0000') {
             var e = document.createElement('a');
-            e.href = global.serverUrl + '/' + response.data.path;
+            e.href = global.serverUrl + response.data.path;
             e.download = (params.title || 'download') + '.md';
             e.click();
           } else {
