@@ -25,12 +25,25 @@
     position: fixed;
     width: 20px;
     height: 20px;
-    border-top-right-radius: 20px;
+    border-top-right-radius: 15px;
     bottom: 0;
     left: 0;
-    background: #f8f8f8;
+    background: #1f5498;
     text-indent: 4px;
-    color: #aaa;
+    color: #fff;
+    font-size: 16px;
+    outline: none;
+    /*text-align: center;*/
+    /*line-height: 30px;*/
+    cursor: pointer;
+  }
+  #music:hover{
+    background: none;
+  }
+  #music:hover>#music-content {
+    color: #c74740;
+    font-weight: 900;
+    transform: translateX(5px) translateY(-5px) scale(1.5);
   }
   
   #music-iframe {
@@ -44,7 +57,7 @@
 
 <body id="mydiv">
   <div id="app"></div>
-  <div id="music" onselect="return false;" onselectstart="return false;">
+  <div tabindex="-1" id="music" onselect="return false;" onselectstart="return false;">
     <div id="music-content">♪</div>
     <iframe id="music-iframe" frameborder="no" border="0" marginwidth="0" marginheight="0" width="330" height="320" src="//music.163.com/outchain/player?type=4&amp;id=84006&amp;auto=0&amp;height=430">载入中,请稍后...</iframe>
   </div>
@@ -53,19 +66,22 @@
   var musicIframe = document.getElementById("music-iframe");
   var musicContent = document.getElementById("music-content");
   music.onclick = function() {
-    if (musicIframe.src == "") {
-      musicContent.innerText = "..."
-      musicIframe.src = "//music.163.com/outchain/player?type=4&amp;id=84006&amp;auto=0&amp;height=430";
-      musicIframe.onload = function() {
-        console.log('loading');
-        musicContent.innerText = "♪"
-      }
-    }
+    // if (musicIframe.src == "") {
+    //   musicContent.innerText = "..."
+    //   musicIframe.src = "//music.163.com/outchain/player?type=4&amp;id=84006&amp;auto=0&amp;height=430";
+    //   musicIframe.onload = function() {
+    //     console.log('loading');
+    //     musicContent.innerText = "♪"
+    //   }
+    // }
     if (musicIframe.style.display == "none") {
       musicIframe.style.display = "block";
     } else {
       musicIframe.style.display = "none";
     }
+  }
+  music.onblur = function() {
+    musicIframe.style.display = "none";
   }
   </script>
   <!-- built files will be auto injected -->
