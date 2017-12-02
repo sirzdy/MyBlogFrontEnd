@@ -1,7 +1,7 @@
 <template>
   <div v-title data-title="聊天室">
     <Header></Header>
-    <div style="z-index: 1060;">
+    <div style="z-index: 1060;position:relative;">
       <div class="circle" v-show="!userPanel&&!current.name" @click="userPanel=true;"><i class="fa fa-home fa-2x"></i></div>
       <div class="chat flex-column flex-center">
         <div class="flex-column-emp">
