@@ -32,6 +32,7 @@ new Vue({
   template: '<App/>',
   components: { App },
   created() {
+    //实现域名http重定向https，www重定向为非www
     if (process.env.NODE_ENV == "production") {
       var href = window.location.href;
       if (!/^https/.test(href)) {
@@ -54,11 +55,12 @@ new Vue({
       global.serverUrl = 'https://localhost/';
       global.chatServerUrl = 'https://localhost';
     } else if (process.env.NODE_ENV == "production") {
-      global.serverUrl = 'https://localhost/';
-      global.chatServerUrl = 'https://localhost';
       // global.serverUrl = 'https://zhangdanyang.com/';
-      // global.chatServerUrl = 'https://zhangdanyang.com';
+      // global.chatServerUrl = 'https://zhangdanyang.com'; 
+      global.serverUrl = '/';
+      global.chatServerUrl = '';
     }
+    // 网易云音乐模块
     (function() {
       var music = document.getElementById("music");
       var musicIframe = document.getElementById("music-iframe");
