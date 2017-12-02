@@ -1,159 +1,161 @@
 <template>
   <div v-title data-title="聊天室">
     <Header></Header>
-    <div class="circle" v-show="!userPanel&&!current.name" @click="userPanel=true;"><i class="fa fa-home fa-2x"></i></div>
-    <div class="chat flex-column flex-center">
-      <div class="flex-column-emp">
-        <div class="circle" v-on:click="hasLogined=true;logIn();" v-show="!hasLogined">进入</div>
-        <!-- <button v-on:click="hasLogined=true;logIn();" v-show="!hasLogined">进入</button>
+    <div style="z-index: 1060;">
+      <div class="circle" v-show="!userPanel&&!current.name" @click="userPanel=true;"><i class="fa fa-home fa-2x"></i></div>
+      <div class="chat flex-column flex-center">
+        <div class="flex-column-emp">
+          <div class="circle" v-on:click="hasLogined=true;logIn();" v-show="!hasLogined">进入</div>
+          <!-- <button v-on:click="hasLogined=true;logIn();" v-show="!hasLogined">进入</button>
         <button v-on:click="hasLogined=false;logOut()" v-show="hasLogined">退出</button> -->
-      </div>
-      <div class="chat-box flex-row flex-center">
-        <div class="flex-row-emp" style="min-width:10px;"></div>
-        <!-- user start -->
-        <div class="user-panel flex-column flex-center" v-show="hasLogined&&userPanel">
-          <div class="user-panel-head">
-            通讯录
-          </div>
-          <div class="flex-row user-panel-tabs">
-            <div class="flex-row-emp user-panel-tab" :class="{'tab-active':curTab==1}" @click="curTab=1;">在线用户
-            </div>
-            <div class="flex-row-emp user-panel-tab" :class="{'tab-active':curTab==2}" @click="curTab=2;">聊天室
-            </div>
-            <div class="flex-row-emp" :class="{'tab-active':curTab==3}" @click="curTab=3">最近联系
-            </div>
-          </div>
-          <div class="flex-column-emp flex-column" style="width:100%;">
-            <div class="flex-column-emp" style="width:100%;overflow:scroll;flex-wrap: nowrap;" v-show="curTab==1">
-              <div v-for="chat in chatList" v-if="chat" class="chatList flex-row flex-center" @click="chatWithPerson(chat);setPanel(false);notReadMesCount[chat._id]=null;">
-                <span>{{chat.nickname}}</span>
-                <span class="flex-row-emp"></span>
-                <span class="badge">{{notReadMesCount[chat._id]}}</span>
-              </div>
-              <div style="height:25px;text-align:center;line-height:25px;color:#999">
-                当前共{{chatList.length}}人在线
-                <i class="fa fa-refresh btn-refresh" id="btnChatRefresh" @click="getChatList()"></i>
-              </div>
-            </div>
-            <div class="flex-column-emp flex-column" style="width:100%;overflow:scroll;flex-wrap: nowrap;" v-show="curTab==2">
-              <div v-for="room in roomList" v-if="room" class="chatList flex-row flex-center" @click="enterRoom(room);setPanel(false);notReadMesCount[room.name]=null;">
-                <span>{{room.name}}</span>
-                <span class="flex-row-emp"></span>
-                <span class="badge">{{notReadMesCount[room.name]}}</span>
-                <span v-show="inRoom[room.name]" @click.stop="leaveRoom(room.name)"><i class="fa fa-sign-out fa-fw"></i></span>
-                <span v-show="room.creator==socketInfo._id" @click.stop="removeRoom(room.name)"><i class="fa fa-close fa-fw"></i></span>
-              </div>
-              <div style="height:25px;text-align:center;line-height:25px;color:#999">
-                当前共{{roomList.length}}个聊天室
-                <i class="fa fa-refresh btn-refresh" id="btnRoomRefresh" @click="getRoomList()"></i>
-              </div>
-              <div class="flex-column-emp"></div>
-              <div class="input-group">
-                <input type="text" class="form-control" placeholder="请输入房间名字" v-model="addRoomName">
-                <span class="input-group-addon" v-on:click="addRoom">新增聊天室</span>
-              </div>
-            </div>
-            <div class="flex-column-emp" style="width:100%;overflow:scroll;flex-wrap: nowrap;" v-show="curTab==3">
-              <div v-for="recent in recentList" v-if="recentList" class="chatList flex-row flex-center" @click="chatRecent(recent);setPanel(false);">
-                <span>{{recent.nickname||recent.name}}</span>
-                <span class="flex-row-emp"></span>
-                <span class="badge">{{notReadMesCount[recent._id||recent.name]}}</span>
-                <i class="fa fa-group" v-if="recent.type=='room'"></i>
-              </div>
-            </div>
-          </div>
-          <div class="user-panel-exit flex-row">
-            <div class="flex-row-emp" v-on:click="logOut()">退出</div>
-            <!-- <div class="flex-row-emp" v-on:click="userPanel=false;">隐藏</div> -->
-          </div>
         </div>
-        <!-- user end -->
-        <div class="flex-row-emp" style="min-width:10px;max-width:50px;" v-if="userPanel&&current&&current.name"></div>
-        <!-- chat start -->
-        <div class="chat-panel flex-column flex-center" v-if="current&&current.name">
-          <div class="chat-panel-head flex-row flex-center">
-            <i class="fa fa-user-circle-o fa-fw" @click="userPanel=!userPanel"></i>
-            <div class="flex-row-emp"></div>
-            {{current.name}}
-            <div class="flex-row-emp"></div>
-            <i class="fa fa-address-book-o fa-fw" v-if="current.type=='room'" @click="usersShow=!usersShow;"></i>
-            <i class="fa fa-sign-out fa-fw" v-if="current.type=='room'" @click="leaveRoom(current.id);setPanel(true)"></i>
-            <i class="fa fa-close fa-fw" @click="initCurrent();setPanel(true)"></i>
+        <div class="chat-box flex-row flex-center">
+          <div class="flex-row-emp" style="min-width:10px;"></div>
+          <!-- user start -->
+          <div class="user-panel flex-column flex-center" v-show="hasLogined&&userPanel">
+            <div class="user-panel-head">
+              通讯录
+            </div>
+            <div class="flex-row user-panel-tabs">
+              <div class="flex-row-emp user-panel-tab" :class="{'tab-active':curTab==1}" @click="curTab=1;">在线用户
+              </div>
+              <div class="flex-row-emp user-panel-tab" :class="{'tab-active':curTab==2}" @click="curTab=2;">聊天室
+              </div>
+              <div class="flex-row-emp" :class="{'tab-active':curTab==3}" @click="curTab=3">最近联系
+              </div>
+            </div>
+            <div class="flex-column-emp flex-column" style="width:100%;">
+              <div class="flex-column-emp" style="width:100%;overflow:scroll;flex-wrap: nowrap;" v-show="curTab==1">
+                <div v-for="chat in chatList" v-if="chat" class="chatList flex-row flex-center" @click="chatWithPerson(chat);setPanel(false);notReadMesCount[chat._id]=null;">
+                  <span>{{chat.nickname}}</span>
+                  <span class="flex-row-emp"></span>
+                  <span class="badge">{{notReadMesCount[chat._id]}}</span>
+                </div>
+                <div style="height:25px;text-align:center;line-height:25px;color:#999">
+                  当前共{{chatList.length}}人在线
+                  <i class="fa fa-refresh btn-refresh" id="btnChatRefresh" @click="getChatList()"></i>
+                </div>
+              </div>
+              <div class="flex-column-emp flex-column" style="width:100%;overflow:scroll;flex-wrap: nowrap;" v-show="curTab==2">
+                <div v-for="room in roomList" v-if="room" class="chatList flex-row flex-center" @click="enterRoom(room);setPanel(false);notReadMesCount[room.name]=null;">
+                  <span>{{room.name}}</span>
+                  <span class="flex-row-emp"></span>
+                  <span class="badge">{{notReadMesCount[room.name]}}</span>
+                  <span v-show="inRoom[room.name]" @click.stop="leaveRoom(room.name)"><i class="fa fa-sign-out fa-fw"></i></span>
+                  <span v-show="room.creator==socketInfo._id" @click.stop="removeRoom(room.name)"><i class="fa fa-close fa-fw"></i></span>
+                </div>
+                <div style="height:25px;text-align:center;line-height:25px;color:#999">
+                  当前共{{roomList.length}}个聊天室
+                  <i class="fa fa-refresh btn-refresh" id="btnRoomRefresh" @click="getRoomList()"></i>
+                </div>
+                <div class="flex-column-emp"></div>
+                <div class="input-group">
+                  <input type="text" class="form-control" placeholder="请输入房间名字" v-model="addRoomName">
+                  <span class="input-group-addon" v-on:click="addRoom">新增聊天室</span>
+                </div>
+              </div>
+              <div class="flex-column-emp" style="width:100%;overflow:scroll;flex-wrap: nowrap;" v-show="curTab==3">
+                <div v-for="recent in recentList" v-if="recentList" class="chatList flex-row flex-center" @click="chatRecent(recent);setPanel(false);">
+                  <span>{{recent.nickname||recent.name}}</span>
+                  <span class="flex-row-emp"></span>
+                  <span class="badge">{{notReadMesCount[recent._id||recent.name]}}</span>
+                  <i class="fa fa-group" v-if="recent.type=='room'"></i>
+                </div>
+              </div>
+            </div>
+            <div class="user-panel-exit flex-row">
+              <div class="flex-row-emp" v-on:click="logOut()">退出</div>
+              <!-- <div class="flex-row-emp" v-on:click="userPanel=false;">隐藏</div> -->
+            </div>
           </div>
-          <div class="flex-row flex-column-emp" style="width:100%;">
-            <div class="flex-column flex-row-emp" style="width:100%;padding:10px 5px;overflow:scroll;flex-wrap: nowrap;" v-bind:id="'mesArea'+current.id">
-              <!-- mes start -->
-              <div v-for="(mes,index) in messages[current.id]">
-                <div v-if="mes.info">
-                  <div class="well well-sm text-center" style="margin-bottom:5px;">
-                    <b>【{{mes.user}}】</b>{{mes.info}}
-                    <span style="color:#999">{{mes.time|formatTime}}</span>
+          <!-- user end -->
+          <div class="flex-row-emp" style="min-width:10px;max-width:50px;" v-if="userPanel&&current&&current.name"></div>
+          <!-- chat start -->
+          <div class="chat-panel flex-column flex-center" v-if="current&&current.name">
+            <div class="chat-panel-head flex-row flex-center">
+              <i class="fa fa-user-circle-o fa-fw" @click="userPanel=!userPanel"></i>
+              <div class="flex-row-emp"></div>
+              {{current.name}}
+              <div class="flex-row-emp"></div>
+              <i class="fa fa-address-book-o fa-fw" v-if="current.type=='room'" @click="usersShow=!usersShow;"></i>
+              <i class="fa fa-sign-out fa-fw" v-if="current.type=='room'" @click="leaveRoom(current.id);setPanel(true)"></i>
+              <i class="fa fa-close fa-fw" @click="initCurrent();setPanel(true)"></i>
+            </div>
+            <div class="flex-row flex-column-emp" style="width:100%;">
+              <div class="flex-column flex-row-emp" style="width:100%;padding:10px 5px;overflow:scroll;flex-wrap: nowrap;" v-bind:id="'mesArea'+current.id">
+                <!-- mes start -->
+                <div v-for="(mes,index) in messages[current.id]">
+                  <div v-if="mes.info">
+                    <div class="well well-sm text-center" style="margin-bottom:5px;">
+                      <b>【{{mes.user}}】</b>{{mes.info}}
+                      <span style="color:#999">{{mes.time|formatTime}}</span>
+                    </div>
                   </div>
-                </div>
-                <div v-else-if="mes.history" class="text-center">
-                  <span style="color:#999;">{{mes.history}}</span>
-                </div>
-                <div v-else class="flex-row chat-mes" style="flex-shrink:0;width:100%;margin-bottom:5px;min-height:50px;">
-                  <div class="flex-column flex-center" style="padding:0;">
-                    <img v-bind:src="mes.user.avatar||avatarBaseUrl+'default.png'" class="img-circle" style="min-width:40px;height:40px;cursor:pointer;">
-                    <div class="flex-column-emp"></div>
+                  <div v-else-if="mes.history" class="text-center">
+                    <span style="color:#999;">{{mes.history}}</span>
                   </div>
-                  <div class="flex-column" style="width:100%;">
-                    <div class="flex-row chat-body-info" style="color:#666">
-                      <div><span>{{mes.user.nickname}}</span> <span style="color:#999">{{mes.time|formatTime}}</span></div>
-                      <div class="flex-row-emp"></div>
-                      <transition name="fade">
-                        <div class="copy-msg" copymes v-bind:index="index"></div>
-                      </transition>
-                      <div class="btn-copy">
-                        <i class="fa fa-copy chat-tool " v-on:click="copy(index)"></i>
+                  <div v-else class="flex-row chat-mes" style="flex-shrink:0;width:100%;margin-bottom:5px;min-height:50px;">
+                    <div class="flex-column flex-center" style="padding:0;">
+                      <img v-bind:src="mes.user.avatar||avatarBaseUrl+'default.png'" class="img-circle" style="min-width:40px;height:40px;cursor:pointer;">
+                      <div class="flex-column-emp"></div>
+                    </div>
+                    <div class="flex-column" style="width:100%;">
+                      <div class="flex-row chat-body-info" style="color:#666">
+                        <div><span>{{mes.user.nickname}}</span> <span style="color:#999">{{mes.time|formatTime}}</span></div>
+                        <div class="flex-row-emp"></div>
+                        <transition name="fade">
+                          <div class="copy-msg" copymes v-bind:index="index"></div>
+                        </transition>
+                        <div class="btn-copy">
+                          <i class="fa fa-copy chat-tool " v-on:click="copy(index)"></i>
+                        </div>
+                      </div>
+                      <div class="chat-body" v-bind:index="index" message v-bind:message="mes.msg">
                       </div>
                     </div>
-                    <div class="chat-body" v-bind:index="index" message v-bind:message="mes.msg">
-                    </div>
+                  </div>
+                </div>
+                <!-- mes end -->
+              </div>
+              <div v-if="current.type=='room' && usersShow" class="flex-column" style="max-width:150px;width:150px;min-width:100pxpadding:10px 5px;overflow:scroll;flex-wrap: nowrap;border-left:1px solid #ccc">
+                <div v-for="user in roomUsers[current.id]">
+                  <div class="well well-sm text-center" style="margin-bottom:5px;">
+                    {{user.nickname}}
                   </div>
                 </div>
               </div>
-              <!-- mes end -->
             </div>
-            <div v-if="current.type=='room' && usersShow" class="flex-column" style="max-width:150px;width:150px;min-width:100pxpadding:10px 5px;overflow:scroll;flex-wrap: nowrap;border-left:1px solid #ccc">
-              <div v-for="user in roomUsers[current.id]">
-                <div class="well well-sm text-center" style="margin-bottom:5px;">
-                  {{user.nickname}}
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="chat-panel-foot flex-column" id="chatIframeBox" tabindex="-1" style="outline:none;">
-            <div class="chat-tools flex-row flex-start">
-              <i tabindex="-1" class="fa fa-smile-o fa-lg fa-fw chat-tool" style="position: relative;outline:none;" v-on:click="toggleExpression($event)" v-on:blur="toggleExpression($event,false)">
+            <div class="chat-panel-foot flex-column" id="chatIframeBox" tabindex="-1" style="outline:none;">
+              <div class="chat-tools flex-row flex-start">
+                <i tabindex="-1" class="fa fa-smile-o fa-lg fa-fw chat-tool" style="position: relative;outline:none;" v-on:click="toggleExpression($event)" v-on:blur="toggleExpression($event,false)">
                 <div class="expression" style="cursor:auto;" onselect="return false">
                   <div >
                     <img class="emoji" v-bind:src="e.url" alt="" v-for="e in expression.emoji.list" v-on:click="addEmoji($event)">
                   </div>
                 </div>
               </i>
-              <i class="fa fa-photo fa-lg fa-fw chat-tool"></i>
-              <i class="fa fa-microphone fa-lg fa-fw chat-tool"></i>
-              <i class="fa fa-phone fa-lg fa-fw chat-tool"></i>
-              <i class="fa fa-video-camera fa-lg fa-fw chat-tool"></i>
-              <i class="fa fa-map-marker fa-lg fa-fw chat-tool"></i>
-              <i class="fa fa-info fa-lg fa-fw chat-tool"></i>
-              <!-- <i class="fa fa-at fa-lg fa-fw chat-tool"></i> -->
-              <i class="fa fa-save fa-lg fa-fw chat-tool"></i>
-              <i class="fa fa-trash-o fa-lg fa-fw chat-tool" @click="clear()"></i>
-              <div class="flex-row-emp"></div>
-              <button class="btn btn-default" id="send" v-on:click="send($event)"><i class="fa fa-send-o"></i> 发送</button>
+                <i class="fa fa-photo fa-lg fa-fw chat-tool"></i>
+                <i class="fa fa-microphone fa-lg fa-fw chat-tool"></i>
+                <i class="fa fa-phone fa-lg fa-fw chat-tool"></i>
+                <i class="fa fa-video-camera fa-lg fa-fw chat-tool"></i>
+                <i class="fa fa-map-marker fa-lg fa-fw chat-tool"></i>
+                <i class="fa fa-info fa-lg fa-fw chat-tool"></i>
+                <!-- <i class="fa fa-at fa-lg fa-fw chat-tool"></i> -->
+                <i class="fa fa-save fa-lg fa-fw chat-tool"></i>
+                <i class="fa fa-trash-o fa-lg fa-fw chat-tool" @click="clear()"></i>
+                <div class="flex-row-emp"></div>
+                <button class="btn btn-default" id="send" v-on:click="send($event)"><i class="fa fa-send-o"></i> 发送</button>
+              </div>
+              <iframe class="chat-iframe" frameborder="0" height="99" placeholder="请输入内容...">
+                <!-- contenteditable="true" -->
+              </iframe>
             </div>
-            <iframe class="chat-iframe" frameborder="0" height="99" placeholder="请输入内容...">
-              <!-- contenteditable="true" -->
-            </iframe>
           </div>
+          <div class="flex-row-emp" style="min-width:10px;"></div>
         </div>
-        <div class="flex-row-emp" style="min-width:10px;"></div>
+        <!-- chat end -->
+        <div class="flex-column-emp"></div>
       </div>
-      <!-- chat end -->
-      <div class="flex-column-emp"></div>
     </div>
   </div>
 </template>
