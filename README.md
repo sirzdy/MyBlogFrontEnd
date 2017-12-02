@@ -1,30 +1,22 @@
-# 张丹阳的博客
+## 项目介绍与描述
 
-> A Vue.js project
+这是基于 NodeJS+MongoDB+VueJS+Socket 等技术与框架搭建的[个人博客](zhangdanyang.com)。
 
-## Build Setup
+[前端源码](https://github.com/sirzdy/MyBlogFrontEnd)
 
-``` bash
-# install dependencies
-npm install
+[后端源码+前端打包后代码（包含项目相关更多信息）](https://github.com/sirzdy/MyBlogBackEnd)
 
-# serve with hot reload at localhost:8080
-npm run dev
+## 编辑与调试
 
-# build for production with minification
-npm run build
+### 运行
 
-# build for production and view the bundle analyzer report
-npm run build --report
+    # install dependencies
+    npm install
 
-# run unit tests
-npm run unit
+    # serve with hot reload at localhost:8080
+    npm run dev
 
-# run e2e tests
-npm run e2e
+### 打包
 
-# run all tests
-npm test
-```
-
-For detailed explanation on how things work, checkout the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+    # build for production with minification
+    npm run build

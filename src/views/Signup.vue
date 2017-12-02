@@ -17,7 +17,7 @@
         <div class="alert alert-danger margintop20" role="alert" v-show="msg.show"><b>{{msg.con}}</b></div>
         <button type="button" v-on:click="signup" class="btn btn-primary btn-lg btn-block margintop20">注册</button>
         <div class="alert alert-success margintop20" role="alert" v-show="suc.show">
-          <b><span v-show="suc.type=='vercode'">获取验证码成功。如果未收到，请<a href="">戳我</a></span></b>
+          <b><span v-show="suc.type=='vercode'">获取验证码成功。如果未收到，请查找垃圾箱。</span></b>
           <b><span v-show="suc.type=='signup'">注册成功。去<router-link :to="{ name: 'Signin'}">登录</router-link></span></b>
         </div>
         <div class="alert alert-danger margintop20" role="alert" v-show="err.show"><b>{{err.con}}</b></div>

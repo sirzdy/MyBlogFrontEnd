@@ -9,11 +9,24 @@
       <p><span class="element"></span></p>
     </div> -->
     <div class="nav-footer">
-      <a href="mailto:boxuerixin@hotmail.com" target="_blank"><i class="fa fa-fw fa-envelope fa-lg" title="邮件"></i></a>
-      <a href="http://www.jianshu.com/u/97887a368d79" target="_blank"><i class="fa fa-fw fa-book fa-lg" title="简书"></i></a>
-      <a href="https://github.com/sirzdy" target="_blank"><i class="fa fa-fw fa-github fa-lg" title="Github"></i></a>
-      <a href="http://weibo.com/u/1811430681" target="_blank"><i class="fa fa-fw fa-weibo fa-lg" title="微博"></i></a>
-      <a href="https://www.facebook.com/zhangdanyang" target="_blank"><i class="fa fa-fw fa-facebook fa-lg" title="facebook"></i></a>
+      <a href="mailto:boxuerixin@hotmail.com" target="_blank">
+        <i class="fa fa-fw fa-envelope fa-lg" title="邮件"></i>
+      </a>
+      <a href="//github.com/sirzdy" target="_blank">
+        <i class="fa fa-fw fa-github fa-lg" title="Github"></i>
+      </a>
+      <a href="//www.jianshu.com/u/97887a368d79" target="_blank">
+        <i class="fa fa-fw fa-lg" title="简书" style="font-weight:900">简</i>
+      </a>
+      <a href="//www.zhihu.com/people/zhang-dan-yang" target="_blank">
+        <i class="fa fa-fw fa-lg" title="知乎" style="font-weight:900">知</i>
+      </a>
+      <a href="//weibo.com/u/1811430681" target="_blank">
+        <i class="fa fa-fw fa-weibo fa-lg" title="微博"></i>
+      </a>
+      <a href="//www.facebook.com/zhangdanyang" target="_blank">
+        <i class="fa fa-fw fa-facebook fa-lg" title="Facebook"></i>
+      </a>
     </div>
     <Header></Header>
   </div>
@@ -127,7 +140,7 @@ export default {
   width: 100%;
   top: 0;
   height: 100%;
-  background:#1f5498;
+  background: #1f5498;
 }
 
 #path {

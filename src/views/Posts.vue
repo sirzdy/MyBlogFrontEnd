@@ -105,7 +105,7 @@ export default {
         order: 'heat', //排序方式 heat 热度 time 发布时间
         listinfo: {
           page: 0,
-          size: 5,
+          size: 10,
           pages: 0,
           pagearr: [],
           count: 6

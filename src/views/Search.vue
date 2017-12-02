@@ -1,128 +1,130 @@
 <template>
   <div v-title data-title="搜索">
     <Header></Header>
-    <!-- 基本搜索 start -->
-    <div class="col-xs-12">
-      <div class="input-group input-group " style="margin:20px 0;" v-show="!advancedSearch">
-        <input type="text" class="form-control" placeholder="请输入搜索关键词（站内搜索）" v-model="keyword" @keyup.enter="mode=false;search()"></input>
-        <span class="input-group-addon" style="cursor:pointer" v-on:click="mode=false;search()"><i class="fa fa-search"></i></span>
-        <span class="input-group-addon" style="cursor:pointer" v-on:click="advancedSearch=!advancedSearch">高级搜索</span>
-      </div>
-    </div>
-    <!-- 基本搜索 end -->
-    <!-- 高级搜索 start -->
-    <div v-show="advancedSearch" style="margin-top:10px;">
-      <div class="col-xs-12 col-sm-12 col-md-12" style="margin-top:10px">
-        <div class="input-group">
-          <span class="input-group-addon">标题</span>
-          <input type="text" class="form-control" placeholder="请输入标题" v-model="query.title">
-        </div>
-      </div>
-      <div class="col-xs-12 col-sm-12 col-md-12" style="margin-top:10px">
-        <div class="input-group">
-          <span class="input-group-addon">内容</span>
-          <input type="text" class="form-control" placeholder="请输入内容" v-model="query.content">
-        </div>
-      </div>
-      <div class="col-xs-12 col-sm-4 col-md-4" style="margin-top:10px">
-        <div class="input-group">
-          <span class="input-group-addon">作者</span>
-          <input type="text" class="form-control" placeholder="请输入作者" v-model="query.author">
-        </div>
-      </div>
-      <div class="col-xs-12 col-sm-4 col-md-4" style="margin-top:10px">
-        <div class="input-group">
-          <span class="input-group-addon">分类</span>
-          <select class="form-control" style="border-radius:0" v-model="query.category">
-            <option value="" v-for="option in categories" v-bind:value="option._id ">{{option.name}}</option>
-          </select>
-        </div>
-      </div>
-      <div class="col-xs-12 col-sm-4 col-md-4" style="margin-top:10px">
-        <div class="input-group">
-          <span class="input-group-addon">标签</span>
-          <input type="text" class="form-control" placeholder="请输入标签" v-model="query.tags">
-        </div>
-      </div>
-      <div class="col-xs-12 col-sm-6 col-md-6" style="margin-top:10px">
-        <div class="input-group">
-          <span class="input-group-addon">发布时间起始日</span>
-          <input type="date" class="form-control" v-model="queryTime.publishTimeStart">
-        </div>
-      </div>
-      <div class="col-xs-12 col-sm-6 col-md-6" style="margin-top:10px">
-        <div class="input-group">
-          <span class="input-group-addon">发布时间结束日</span>
-          <input type="date" class="form-control" v-model="queryTime.publishTimeEnd">
-        </div>
-      </div>
-      <div class="col-xs-12 col-sm-6 col-md-6" style="margin-top:10px">
-        <div class="input-group">
-          <span class="input-group-addon">最后修改起始日</span>
-          <input type="date" class="form-control" v-model="queryTime.updateTimeStart">
-        </div>
-      </div>
-      <div class="col-xs-12 col-sm-6 col-md-6" style="margin-top:10px">
-        <div class="input-group">
-          <span class="input-group-addon">最后修改结束日</span>
-          <input type="date" class="form-control" v-model="queryTime.updateTimeEnd">
-        </div>
-      </div>
-      <div class="col-xs-12 col-sm-12 col-md-12 text-center" style="margin:10px 0 20px;">
-        <div class="btn-group ">
-          <button type="button" class="btn btn-default" v-on:click="mode=true;search()">搜索</button>
-          <button type="button" class="btn btn-default" v-on:click="advancedSearch=!advancedSearch">基本搜索</button>
-        </div>
-      </div>
-    </div>
-    <!-- 高级搜索 end -->
-    <div class="text-center" style="margin-bottom:20px">
-      <label class="radio-inline">
-        <input type="radio" name="order" v-model="order" value="heat"> 按文章热度
-      </label>
-      <label class="radio-inline">
-        <input type="radio" name="order" v-model="order" value="time"> 按发布时间
-      </label>
-    </div>
-    <!-- 搜索结果 start -->
-    <div class="text-center" v-show="loading">
-      <i class="fa fa-spinner fa-spin fa-2x"></i>
-    </div>
-    <div v-show="loaded&&!loading&&result.list.length==0" class="col-xs-12">
-      <div class="alert alert-result">未找到相关记录</div>
-    </div>
-    <div v-show="!loading&&result.list.length>0">
+    <div style="max-width:800px;margin:0 auto;">
+      <!-- 基本搜索 start -->
       <div class="col-xs-12">
-        <div class="alert alert-result">共找到<strong>【{{result.totalSize}}】</strong>条记录，当前显示第【{{result.start}}】-【{{result.end}}】</strong>条记录</div>
+        <div class="input-group input-group " style="margin:20px 0;" v-show="!advancedSearch">
+          <input type="text" class="form-control" placeholder="请输入搜索关键词（站内搜索）" v-model="keyword" @keyup.enter="mode=false;search()"></input>
+          <span class="input-group-addon" style="cursor:pointer" v-on:click="mode=false;search()"><i class="fa fa-search"></i></span>
+          <span class="input-group-addon" style="cursor:pointer" v-on:click="advancedSearch=!advancedSearch">高级搜索</span>
+        </div>
       </div>
-      <div v-for="post in result.list">
-        <Brief v-bind:post="post"></Brief>
+      <!-- 基本搜索 end -->
+      <!-- 高级搜索 start -->
+      <div v-show="advancedSearch" style="margin-top:10px;">
+        <div class="col-xs-12 col-sm-12 col-md-12" style="margin-top:10px">
+          <div class="input-group">
+            <span class="input-group-addon">标题</span>
+            <input type="text" class="form-control" placeholder="请输入标题" v-model="query.title">
+          </div>
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-12" style="margin-top:10px">
+          <div class="input-group">
+            <span class="input-group-addon">内容</span>
+            <input type="text" class="form-control" placeholder="请输入内容" v-model="query.content">
+          </div>
+        </div>
+        <div class="col-xs-12 col-sm-4 col-md-4" style="margin-top:10px">
+          <div class="input-group">
+            <span class="input-group-addon">作者</span>
+            <input type="text" class="form-control" placeholder="请输入作者" v-model="query.author">
+          </div>
+        </div>
+        <div class="col-xs-12 col-sm-4 col-md-4" style="margin-top:10px">
+          <div class="input-group">
+            <span class="input-group-addon">分类</span>
+            <select class="form-control" style="border-radius:0" v-model="query.category">
+              <option value="" v-for="option in categories" v-bind:value="option._id ">{{option.name}}</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-xs-12 col-sm-4 col-md-4" style="margin-top:10px">
+          <div class="input-group">
+            <span class="input-group-addon">标签</span>
+            <input type="text" class="form-control" placeholder="请输入标签" v-model="query.tags">
+          </div>
+        </div>
+        <div class="col-xs-12 col-sm-6 col-md-6" style="margin-top:10px">
+          <div class="input-group">
+            <span class="input-group-addon">发布时间起始日</span>
+            <input type="date" class="form-control" v-model="queryTime.publishTimeStart">
+          </div>
+        </div>
+        <div class="col-xs-12 col-sm-6 col-md-6" style="margin-top:10px">
+          <div class="input-group">
+            <span class="input-group-addon">发布时间结束日</span>
+            <input type="date" class="form-control" v-model="queryTime.publishTimeEnd">
+          </div>
+        </div>
+        <div class="col-xs-12 col-sm-6 col-md-6" style="margin-top:10px">
+          <div class="input-group">
+            <span class="input-group-addon">最后修改起始日</span>
+            <input type="date" class="form-control" v-model="queryTime.updateTimeStart">
+          </div>
+        </div>
+        <div class="col-xs-12 col-sm-6 col-md-6" style="margin-top:10px">
+          <div class="input-group">
+            <span class="input-group-addon">最后修改结束日</span>
+            <input type="date" class="form-control" v-model="queryTime.updateTimeEnd">
+          </div>
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-12 text-center" style="margin:10px 0 20px;">
+          <div class="btn-group ">
+            <button type="button" class="btn btn-default" v-on:click="mode=true;search()">搜索</button>
+            <button type="button" class="btn btn-default" v-on:click="advancedSearch=!advancedSearch">基本搜索</button>
+          </div>
+        </div>
       </div>
-      <nav aria-label="Page navigation" class="text-center" v-if="listinfo.pages>1">
-        <ul class="pagination">
-          <li v-bind:class="{'disabled':listinfo.page==1}" v-on:click="listinfo.page!=1&&search(1)">
-            <a><i class="fa fa-angle-double-left"></i></a>
-          </li>
-          <li v-bind:class="{'disabled':listinfo.page==1}" v-on:click="listinfo.page!=1&&search(listinfo.page-1)">
-            <a><i class="fa fa-angle-left"></i></a>
-            <!--             <a aria-label="Previous">
+      <!-- 高级搜索 end -->
+      <div class="text-center" style="margin-bottom:20px">
+        <label class="radio-inline">
+          <input type="radio" name="order" v-model="order" value="heat" v-on:click="search()"> 按文章热度
+        </label>
+        <label class="radio-inline">
+          <input type="radio" name="order" v-model="order" value="time" v-on:click="search()"> 按发布时间
+        </label>
+      </div>
+      <!-- 搜索结果 start -->
+      <div class="text-center" v-show="loading">
+        <i class="fa fa-spinner fa-spin fa-2x"></i>
+      </div>
+      <div v-show="loaded&&!loading&&result.list.length==0" class="col-xs-12">
+        <div class="alert alert-result">未找到相关记录</div>
+      </div>
+      <div v-show="!loading&&result.list.length>0">
+        <div class="col-xs-12">
+          <div class="alert alert-result">共找到<strong>【{{result.totalSize}}】</strong>条记录，当前显示第【{{result.start}}】-【{{result.end}}】</strong>条记录</div>
+        </div>
+        <div v-for="post in result.list">
+          <Brief v-bind:post="post"></Brief>
+        </div>
+        <nav aria-label="Page navigation" class="text-center" v-if="listinfo.pages>1">
+          <ul class="pagination">
+            <li v-bind:class="{'disabled':listinfo.page==1}" v-on:click="listinfo.page!=1&&search(1)">
+              <a><i class="fa fa-angle-double-left"></i></a>
+            </li>
+            <li v-bind:class="{'disabled':listinfo.page==1}" v-on:click="listinfo.page!=1&&search(listinfo.page-1)">
+              <a><i class="fa fa-angle-left"></i></a>
+              <!--             <a aria-label="Previous">
               <span aria-hidden="true">&laquo;</span>
             </a> -->
-          </li>
-          <li v-for="n in listinfo.pagearr" v-bind:class="{'active':n==listinfo.page,'disabled':n=='...'}" v-on:click="n!='...'&&n!=listinfo.page&&search(n)">
-            <a>{{n}}</a>
-          </li>
-          <li v-bind:class="{'disabled':listinfo.page==listinfo.pages}" v-on:click="listinfo.page!=listinfo.pages&&search(listinfo.page+1)">
-            <a><i class="fa fa-angle-right"></i></a>
-            <!--             <a aria-label="Next">
+            </li>
+            <li v-for="n in listinfo.pagearr" v-bind:class="{'active':n==listinfo.page,'disabled':n=='...'}" v-on:click="n!='...'&&n!=listinfo.page&&search(n)">
+              <a>{{n}}</a>
+            </li>
+            <li v-bind:class="{'disabled':listinfo.page==listinfo.pages}" v-on:click="listinfo.page!=listinfo.pages&&search(listinfo.page+1)">
+              <a><i class="fa fa-angle-right"></i></a>
+              <!--             <a aria-label="Next">
               <span aria-hidden="true">&raquo;</span>
             </a> -->
-          </li>
-          <li v-bind:class="{'disabled':listinfo.page==listinfo.pages}" v-on:click="listinfo.page!=listinfo.pages&&search(listinfo.pages)">
-            <a><i class="fa fa-angle-double-right"></i></a>
-          </li>
-        </ul>
-      </nav>
+            </li>
+            <li v-bind:class="{'disabled':listinfo.page==listinfo.pages}" v-on:click="listinfo.page!=listinfo.pages&&search(listinfo.pages)">
+              <a><i class="fa fa-angle-double-right"></i></a>
+            </li>
+          </ul>
+        </nav>
+      </div>
     </div>
     <!-- 搜索结果 end -->
   </div>
@@ -146,7 +148,7 @@ export default {
         order: 'heat', //排序方式 heat 热度 time 发布时间
         listinfo: {
           page: 0,
-          size: 2,
+          size: 10,
           pages: 0,
           pagearr: [],
           count: 6

@@ -32,19 +32,43 @@ new Vue({
   template: '<App/>',
   components: { App },
   created() {
+    if (process.env.NODE_ENV == "production") {
+      var href = window.location.href;
+      if (!/^https/.test(href)) {
+        href = href.replace('http', 'https');
+      }
+      if (/^https:\/\/www\./.test(href)) {
+        href = href.replace('www.', '');
+      }
+      if (window.location.href != href) {
+        window.location.href = href;
+        return;
+      }
+    }
     global.expression = {};
     global.expression.emoji = '../static/resource/expression/emoji/';
     global.avatarBaseUrl = '../static/resource/avatar/default/';
     global.resourceBaseUrl = '../static/resource/';
     //生产环境与开发环境url配置
     if (process.env.NODE_ENV == "development") {
-      global.serverUrl = 'http://localhost/';
-      global.chatServerUrl = 'http://localhost';
+      global.serverUrl = 'https://localhost/';
+      global.chatServerUrl = 'https://localhost';
     } else if (process.env.NODE_ENV == "production") {
-      // global.serverUrl = 'http://localhost/';
-      // global.chatServerUrl = 'http://localhost';
-      global.serverUrl = 'http://zhangdanyang.com/';
-      global.chatServerUrl = 'http://zhangdanyang.com';
+      global.serverUrl = 'https://localhost/';
+      global.chatServerUrl = 'https://localhost';
+      // global.serverUrl = 'https://zhangdanyang.com/';
+      // global.chatServerUrl = 'https://zhangdanyang.com';
     }
+    (function() {
+      var music = document.getElementById("music");
+      var musicIframe = document.getElementById("music-iframe");
+      musicIframe.src = "//music.163.com/outchain/player?type=4&id=84006&auto=0&height=430";
+      music.onclick = function() {
+        musicIframe.style.display == "none" ? musicIframe.style.display = "block" : musicIframe.style.display = "none";
+      }
+      music.onblur = function() {
+        musicIframe.style.display = "none";
+      }
+    })()
   }
 })

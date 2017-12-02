@@ -1,7 +1,7 @@
 <template>
   <div v-title data-title="作品">
     <Header></Header>
-    <div style="max-width:800px;width:100%;background:#337ab7;margin:20px auto;border-radius:15px;padding:20px;">
+    <div style="max-width:800px;width:96%;background:#337ab7;margin:20px auto;border-radius:15px;padding:20px;">
       <div class="" v-for="sort in works">
         <div class="page-header">
           <h3 style="color:#fff;">{{sort.name}} <small style="color:#eee;">{{sort.description}}</small></h3>
@@ -35,8 +35,18 @@ export default {
     },
     created() {
       var that = this;
+      console.log("get works")
       $.getJSON("../../static/works/works.json", function(data) {
-        that.works = data;
+        console.log(data);
+        if (data.length == 0) {
+          that.works = [{
+            "name": "暂时没有作品",
+            "description": "No works",
+            "items": []
+          }];
+        } else {
+          that.works = data;
+        }
       });
     }
 }

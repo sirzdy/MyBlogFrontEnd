@@ -99,6 +99,9 @@
           <li v-on:click="goChangePassword" @click="myMenuShow=false">
             <i class="fa fa-key fa-fw"></i> 修改密码
           </li>
+          <li v-on:click="downloadMyPosts" @click="myMenuShow=false">
+            <i class="fa fa-download fa-fw"></i> 打包下载
+          </li>
           <li v-on:click="signout" @click="myMenuShow=false">
             <i class="fa fa-sign-out fa-fw"></i> 退出
           </li>
@@ -339,7 +342,7 @@ export default {
         this.$axios.post('/downloadMyPosts').then(function(response) {
           if (response.data.recode == '0000') {
             var e = document.createElement('a');
-            e.href = global.serverUrl + '/' + response.data.path;
+            e.href = global.serverUrl + response.data.path;
             e.download = ('download') + '.zip';
             e.click();
             // Util.hint('downloading...', 1000);
